@@ -1,0 +1,10 @@
+title: AddonHub
+description: Free, kid-friendly Android app to install Minecraft Bedrock content from CurseForge
+theme: jekyll-theme-minimal
+
+# Documentos internos del proyecto: no se publican en la página.
+exclude:
+  - formulario-curseforge-respuestas.md
+  - solicitud-curseforge.md
+  - publicacion-play.md
+  - licencias

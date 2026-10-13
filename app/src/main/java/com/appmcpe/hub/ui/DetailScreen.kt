@@ -1,0 +1,315 @@
+package com.appmcpe.hub.ui
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import com.appmcpe.hub.catalog.DepInfo
+import com.appmcpe.hub.catalog.InstallPlan
+
+private const val DESCRIPTION_PREVIEW_CHARS = 700
+
+/** Resumen, preview y datos de lo que se va a descargar, antes de instalar. */
+@Composable
+fun DetailScreen(
+    detail: DetailState,
+    onBack: () -> Unit,
+    onInstall: () -> Unit,
+    onToggleOptional: (Int) -> Unit,
+    onAskAdult: () -> Unit,
+    favorite: Boolean,
+    onToggleFavorite: () -> Unit,
+    onOpenCurseForge: () -> Unit,
+) {
+    val mod = detail.mod
+    BackHandler(onBack = onBack)
+
+    val required = InstallPlan.required(mod, detail.infos, detail.selectedOptional)
+    val optional = InstallPlan.optional(mod, detail.infos)
+    val incompatible = InstallPlan.incompatible(mod, detail.infos)
+    val unavailable = InstallPlan.unavailable(mod, detail.infos, detail.selectedOptional)
+    val hasDeps = detail.loadingDeps || detail.depsError || required.isNotEmpty() ||
+        optional.isNotEmpty() || incompatible.isNotEmpty() || unavailable.isNotEmpty()
+    // Todo lo que se descargará (sin contar el contenido principal).
+    val extraCount = InstallPlan.buildPlan(mod, detail.infos, detail.selectedOptional).size - 1
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Sky)
+            .pointerInput(Unit) { detectTapGestures { } },
+    ) {
+        Row(
+            Modifier.fillMaxWidth().padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier
+                    .height(44.dp)
+                    .clip(RoundedCornerShape(22.dp))
+                    .background(Color.White)
+                    .clickable(onClick = onBack)
+                    .padding(horizontal = 20.dp),
+                contentAlignment = Alignment.Center,
+            ) { Text("← Volver", fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = PixelFont, color = DarkGreen) }
+            Spacer(Modifier.weight(1f))
+            FavoriteHeart(favorite, onToggleFavorite, Modifier.background(Color.White, RoundedCornerShape(20.dp)))
+        }
+
+        Column(
+            Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
+        ) {
+            // Preview: capturas de pantalla, o el logo si no hay.
+            val images = mod.screenshots.ifEmpty { listOfNotNull(mod.logoUrl) }
+            if (images.isNotEmpty()) {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    items(images) { url ->
+                        AsyncImage(
+                            model = url,
+                            contentDescription = mod.name,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .size(width = 300.dp, height = 170.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color(0xFFE0E0E0)),
+                        )
+                    }
+                }
+            }
+
+            // Nombre de terceros: fuente normal (la pixelada es muy ancha para nombres largos).
+            Text(mod.name, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+            if (mod.author.isNotBlank()) Text("por ${mod.author}", fontSize = 15.sp, color = Color(0xFF37474F))
+            if (mod.websiteUrl.isNotBlank()) {
+                // Enlace de vuelta al autor en CurseForge; pide el PIN porque es una salida de la app.
+                Text(
+                    "🔒 Ver en CurseForge (solo adultos)",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = DarkGreen,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable(onClick = onOpenCurseForge)
+                        .padding(vertical = 4.dp),
+                )
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                InfoChip("⬇ ${compactCount(mod.downloads)}")
+                InfoChip("🧩 ${contentType(mod.fileName)}")
+                formatSize(mod.sizeBytes).takeIf { it.isNotEmpty() }?.let { InfoChip("📦 $it") }
+            }
+
+            Section("📥 Lo que se va a descargar") {
+                Text(mod.fileName, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(4.dp))
+                if (extraCount > 0) {
+                    Text("+ $extraCount contenido(s) más que necesita", fontSize = 14.sp, color = DarkGreen)
+                    Spacer(Modifier.height(4.dp))
+                }
+                Text(
+                    "Al terminar, se abrirá Minecraft para importarlo automáticamente.",
+                    fontSize = 14.sp,
+                )
+            }
+
+            // Siempre se muestra, para que quede claro que sí se revisó.
+            run {
+                Section("🔗 Otros contenidos") {
+                    if (!hasDeps) {
+                        Text(
+                            "El autor no declara que necesite otros contenidos. " +
+                                "Al instalar también revisamos el interior del archivo.",
+                            fontSize = 14.sp,
+                        )
+                    }
+                    when {
+                        detail.loadingDeps -> Row(verticalAlignment = Alignment.CenterVertically) {
+                            CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 3.dp)
+                            Spacer(Modifier.width(10.dp))
+                            Text("Revisando qué más necesita…", fontSize = 14.sp)
+                        }
+                        detail.depsError -> Text(
+                            "No pudimos revisar sus dependencias. Se intentará de nuevo al instalar.",
+                            fontSize = 14.sp,
+                        )
+                        else -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            if (required.isNotEmpty()) {
+                                DepGroup("Necesario (se instala solo)")
+                                required.forEach { DepRow(it, null, null) }
+                            }
+                            if (unavailable.isNotEmpty()) {
+                                DepGroup("⚠️ No se puede descargar desde aquí")
+                                unavailable.forEach {
+                                    Text("• ${it.name} — búscalo en CurseForge", fontSize = 14.sp)
+                                }
+                            }
+                            if (optional.isNotEmpty()) {
+                                DepGroup("Opcional (tú eliges)")
+                                optional.forEach { dep ->
+                                    DepRow(dep, dep.id in detail.selectedOptional) { onToggleOptional(dep.id) }
+                                }
+                            }
+                            if (incompatible.isNotEmpty()) {
+                                DepGroup("🚫 No lo mezcles con")
+                                incompatible.forEach { Text("• ${it.name}", fontSize = 14.sp) }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Requisitos que el autor menciona en la descripción pero no declaró como dependencia.
+            if (detail.requirements.isNotEmpty()) {
+                Section("⚙️ Lo que pide el autor") {
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        detail.requirements.forEach { Text("• $it", fontSize = 14.sp) }
+                    }
+                }
+            }
+
+            if (mod.summary.isNotBlank()) {
+                Section("📝 Resumen") { Text(mod.summary, fontSize = 16.sp) }
+            }
+
+            Section("📖 Descripción") {
+                when {
+                    detail.loadingDescription -> CircularProgressIndicator(Modifier.size(28.dp))
+                    detail.description.isNullOrBlank() -> Text("No hay descripción disponible.", fontSize = 14.sp)
+                    else -> ExpandableText(detail.description)
+                }
+            }
+            Spacer(Modifier.height(4.dp))
+        }
+
+        Box(Modifier.padding(16.dp)) {
+            when {
+                detail.blockReason != null && detail.blockIsPermanent ->
+                    BigButton("🔒 ${detail.blockReason}", Color.Gray, enabled = false) {}
+                detail.blockReason != null ->
+                    BigButton("🔒 ${detail.blockReason} · Pedir permiso", Color(0xFFEF6C00), onClick = onAskAdult)
+                else -> BigButton(
+                    if (extraCount > 0) "⬇️ INSTALAR TODO (${extraCount + 1})" else "⬇️ INSTALAR",
+                    Green,
+                    enabled = !detail.loadingDeps,
+                    onClick = onInstall,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DepGroup(title: String) {
+    Text(title, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
+}
+
+/** Una dependencia con su logo; con [checked] no nulo muestra una casilla para elegirla. */
+@Composable
+private fun DepRow(dep: DepInfo, checked: Boolean?, onToggle: (() -> Unit)?) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .then(if (onToggle != null) Modifier.clickable(onClick = onToggle) else Modifier),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AsyncImage(
+            model = dep.logoUrl,
+            contentDescription = dep.name,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.size(40.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFFE0E0E0)),
+        )
+        Spacer(Modifier.width(10.dp))
+        Column(Modifier.weight(1f)) {
+            Text(dep.name, fontSize = 15.sp, fontWeight = FontWeight.Bold, maxLines = 2)
+            dep.mod?.let { Text(formatSize(it.sizeBytes), fontSize = 12.sp, color = Color.Gray) }
+        }
+        if (checked != null) Checkbox(checked = checked, onCheckedChange = { onToggle?.invoke() })
+    }
+}
+
+@Composable
+private fun ExpandableText(text: String) {
+    var expanded by remember(text) { mutableStateOf(false) }
+    val long = text.length > DESCRIPTION_PREVIEW_CHARS
+    Text(
+        if (expanded || !long) text else text.take(DESCRIPTION_PREVIEW_CHARS).trimEnd() + "…",
+        fontSize = 14.sp,
+    )
+    if (long) {
+        Text(
+            if (expanded) "Ver menos ▲" else "Leer más ▼",
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            color = DarkGreen,
+            modifier = Modifier.padding(top = 8.dp).clickable { expanded = !expanded },
+        )
+    }
+}
+
+@Composable
+private fun Section(title: String, content: @Composable () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color.White)
+            .padding(14.dp),
+    ) {
+        Text(title, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = DarkGreen)
+        Spacer(Modifier.height(8.dp))
+        content()
+    }
+}
+
+@Composable
+private fun InfoChip(text: String) {
+    Text(
+        text,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+        color = DarkGreen,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+    )
+}

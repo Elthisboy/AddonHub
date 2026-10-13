@@ -1,0 +1,7 @@
+name = "addonhub-proxy"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+# Los secretos NO van aquí. Se cargan con:
+#   npx wrangler secret put CF_API_KEY     (la key de CurseForge)
+#   npx wrangler secret put APP_TOKEN      (una cadena larga al azar; la misma va en local.properties)

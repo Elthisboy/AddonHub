@@ -1,0 +1,20 @@
+*.iml
+.gradle/
+local.properties
+.idea/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+.kotlin/
+CurseForge API Applications/
+docs/formulario-curseforge-respuestas.md
+keystore.properties
+*.jks
+*.keystore
+backend/node_modules/
+backend/.wrangler/
+backend/.dev.vars

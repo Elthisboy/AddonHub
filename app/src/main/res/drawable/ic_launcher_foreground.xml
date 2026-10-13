@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bloque de tierra con césped y una flecha de descarga. Dibujo propio (no es de Minecraft). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- tierra -->
+    <path
+        android:fillColor="#8D6E4B"
+        android:pathData="M30,32h48v46h-48z" />
+    <!-- césped -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M30,32h48v12h-48z" />
+    <path
+        android:fillColor="#388E3C"
+        android:pathData="M30,44h6v4h-6z M42,44h8v3h-8z M58,44h6v5h-6z M70,44h8v3h-8z" />
+    <!-- motas de tierra -->
+    <path
+        android:fillColor="#6D4C2F"
+        android:pathData="M36,56h6v6h-6z M58,52h6v6h-6z M46,68h6v6h-6z M68,64h6v6h-6z" />
+    <!-- insignia de descarga -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M72,58a14,14 0,0 0,0 28a14,14 0,0 0,0 -28z" />
+    <path
+        android:fillColor="#2E7D32"
+        android:pathData="M70,63h4v9h5l-7,8l-7,-8h5z" />
+</vector>
