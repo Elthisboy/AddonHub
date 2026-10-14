@@ -1,30 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Bloque de tierra con césped y una flecha de descarga. Dibujo propio (no es de Minecraft). -->
+<!--
+  Hubi, la mascota de AddonHub (carita cuadrada de "píxeles") con una insignia de descarga.
+  Dibujo propio: no se parece a ningún personaje ni objeto de Minecraft.
+  Cuadrícula de 16x16 casillas de 4,5 dp, desplazada 18 dp para quedar en la zona segura del icono.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- tierra -->
-    <path
-        android:fillColor="#8D6E4B"
-        android:pathData="M30,32h48v46h-48z" />
-    <!-- césped -->
-    <path
-        android:fillColor="#4CAF50"
-        android:pathData="M30,32h48v12h-48z" />
-    <path
-        android:fillColor="#388E3C"
-        android:pathData="M30,44h6v4h-6z M42,44h8v3h-8z M58,44h6v5h-6z M70,44h8v3h-8z" />
-    <!-- motas de tierra -->
-    <path
-        android:fillColor="#6D4C2F"
-        android:pathData="M36,56h6v6h-6z M58,52h6v6h-6z M46,68h6v6h-6z M68,64h6v6h-6z" />
+    <!-- borde y cara -->
+    <path android:fillColor="#2E7D32" android:pathData="M22.5,22.5h63v63h-63z" />
+    <path android:fillColor="#66BB6A" android:pathData="M27,27h54v54h-54z" />
+    <path android:fillColor="#81C784" android:pathData="M27,27h54v9h-54z" />
+    <!-- ojos -->
+    <path android:fillColor="#FFFFFF" android:pathData="M36,45h13.5v13.5h-13.5z M58.5,45h13.5v13.5h-13.5z" />
+    <path android:fillColor="#1B3A1E" android:pathData="M40.5,49.5h4.5v4.5h-4.5z M63,49.5h4.5v4.5h-4.5z" />
+    <!-- mejillas -->
+    <path android:fillColor="#FFAB91" android:pathData="M31.5,63h4.5v4.5h-4.5z M72,63h4.5v4.5h-4.5z" />
+    <!-- sonrisa -->
+    <path android:fillColor="#1B3A1E" android:pathData="M40.5,67.5h27v4.5h-27z M36,63h4.5v4.5h-4.5z M67.5,63h4.5v4.5h-4.5z" />
     <!-- insignia de descarga -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M72,58a14,14 0,0 0,0 28a14,14 0,0 0,0 -28z" />
-    <path
-        android:fillColor="#2E7D32"
-        android:pathData="M70,63h4v9h5l-7,8l-7,-8h5z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M79,68a11,11 0,0 0,0 22a11,11 0,0 0,0 -22z" />
+    <path android:fillColor="#2E7D32" android:pathData="M77.2,73h3.6v6h3.6l-5.4,6.4l-5.4,-6.4h3.6z" />
 </vector>

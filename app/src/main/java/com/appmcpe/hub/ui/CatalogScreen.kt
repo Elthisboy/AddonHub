@@ -38,6 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -249,8 +253,12 @@ fun Chip(text: String, selected: Boolean, onClick: () -> Unit) {
 fun FavoriteHeart(favorite: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
     Box(
         modifier
-            .size(40.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .size(48.dp) // 48 dp: tamaño mínimo recomendado para zonas táctiles
+            .clip(RoundedCornerShape(24.dp))
+            .semantics {
+                contentDescription = if (favorite) "Quitar de favoritos" else "Añadir a favoritos"
+                role = Role.Button
+            }
             .clickable(onClick = onToggle),
         contentAlignment = Alignment.Center,
     ) { Text(if (favorite) "❤️" else "🤍", fontSize = 22.sp) }
@@ -265,6 +273,8 @@ fun ModCard(
     onInstall: () -> Unit,
     /** Texto extra bajo los datos (por ejemplo "Instalado el 12/10"). */
     note: String? = null,
+    /** Icono que se ve mientras carga el logo o si el contenido no tiene. */
+    fallbackEmoji: String = "🧩",
 ) {
     Column(
         Modifier
@@ -275,15 +285,19 @@ fun ModCard(
             .padding(12.dp),
     ) {
         Row {
-            AsyncImage(
-                model = mod.logoUrl,
-                contentDescription = mod.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(84.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFFE0E0E0)),
-            )
+            // Decorativa (null): el nombre ya se lee en el título. Sin logo se muestra un icono.
+            Box(
+                Modifier.size(84.dp).clip(RoundedCornerShape(14.dp)).background(Color(0xFFE0E0E0)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(fallbackEmoji, fontSize = 32.sp)
+                AsyncImage(
+                    model = mod.logoUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize(),
+                )
+            }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 // El nombre es contenido de terceros (largo e impredecible): fuente normal, legible.
@@ -298,8 +312,8 @@ fun ModCard(
                     Text("por ${mod.author}", fontSize = 13.sp, color = Color.Gray, maxLines = 1)
                 }
                 Text(
-                    "⬇ ${compactCount(mod.downloads)}  ·  ${contentType(mod.fileName)}  ·  ${formatSize(mod.sizeBytes)}",
-                    fontSize = 13.sp,
+                    "⬇ ${compactCount(mod.downloads)} · ${contentType(mod.fileName)} · ${formatSize(mod.sizeBytes)}",
+                    fontSize = 12.sp,
                     color = DarkGreen,
                     fontWeight = FontWeight.Bold,
                 )

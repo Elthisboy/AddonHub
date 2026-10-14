@@ -34,6 +34,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,9 +83,10 @@ fun DetailScreen(
         ) {
             Box(
                 Modifier
-                    .height(44.dp)
-                    .clip(RoundedCornerShape(22.dp))
+                    .height(48.dp)
+                    .clip(RoundedCornerShape(24.dp))
                     .background(Color.White)
+                    .semantics { contentDescription = "Volver"; role = Role.Button }
                     .clickable(onClick = onBack)
                     .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.Center,
@@ -104,7 +109,7 @@ fun DetailScreen(
                     items(images) { url ->
                         AsyncImage(
                             model = url,
-                            contentDescription = mod.name,
+                            contentDescription = "Imagen de ${mod.name}",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(width = 300.dp, height = 170.dp)
@@ -127,8 +132,8 @@ fun DetailScreen(
                     color = DarkGreen,
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .clickable(onClick = onOpenCurseForge)
-                        .padding(vertical = 4.dp),
+                        .clickable(role = Role.Button, onClick = onOpenCurseForge)
+                        .padding(vertical = 14.dp), // zona táctil de al menos 48 dp
                 )
             }
 

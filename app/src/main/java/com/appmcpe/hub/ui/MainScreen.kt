@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,6 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,6 +86,8 @@ fun MainScreen(vm: MainViewModel = viewModel()) {
                 .statusBarsPadding()
                 .navigationBarsPadding(),
         ) {
+        // En tabletas el contenido no se estira: columna centrada de 640 dp como máximo (el fondo es el mismo).
+        Box(Modifier.widthIn(max = MAX_CONTENT_WIDTH).fillMaxSize().align(Alignment.TopCenter)) {
         // Herramientas se salta el filtro: solo existe si un adulto la activó.
         // Pestañas: 0 Explorar · 1 Favoritos · 2 Descargas · 3 Herramientas (solo si un adulto la activó).
         val activeTab = if (tab == 3 && !parental.toolsEnabled) 0 else tab
@@ -179,8 +187,11 @@ fun MainScreen(vm: MainViewModel = viewModel()) {
             OnboardingScreen(onDone = ParentalStore::completeOnboarding)
         }
         }
+        }
     }
 }
+
+private val MAX_CONTENT_WIDTH = 640.dp
 
 private enum class ParentStep { NONE, PIN, ZONE }
 
@@ -226,15 +237,17 @@ fun AppHeader(adultMode: Boolean, onAdultOff: () -> Unit, onParents: () -> Unit)
                     .padding(end = 8.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color(0xFFEF6C00))
+                    .semantics { contentDescription = "Modo adulto activo. Toca para salir"; role = Role.Button }
                     .clickable(onClick = onAdultOff)
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                    .padding(horizontal = 12.dp, vertical = 14.dp),
             )
         }
         Box(
             Modifier
-                .size(44.dp)
-                .clip(RoundedCornerShape(22.dp))
+                .size(48.dp)
+                .clip(RoundedCornerShape(24.dp))
                 .background(Color.White)
+                .semantics { contentDescription = "Zona de padres"; role = Role.Button }
                 .clickable(onClick = onParents),
             contentAlignment = Alignment.Center,
         ) { Text("⚙️", fontSize = 22.sp) }
@@ -271,9 +284,15 @@ fun TabBar(active: Int, toolsEnabled: Boolean, onSelect: (Int) -> Unit) {
 private fun TabPill(emoji: String, label: String, selected: Boolean, showLabel: Boolean, onClick: () -> Unit) {
     Box(
         Modifier
-            .height(44.dp)
-            .clip(RoundedCornerShape(22.dp))
+            .height(48.dp) // 48 dp: tamaño mínimo recomendado para zonas táctiles
+            .clip(RoundedCornerShape(24.dp))
             .background(if (selected) DarkGreen else Color.White)
+            // Aunque solo se vea el icono, el lector de pantalla dice el nombre y si está seleccionada.
+            .semantics(mergeDescendants = true) {
+                contentDescription = label
+                role = Role.Tab
+                this.selected = selected
+            }
             .clickable(onClick = onClick)
             .padding(horizontal = if (showLabel) 16.dp else 14.dp),
         contentAlignment = Alignment.Center,

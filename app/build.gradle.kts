@@ -37,8 +37,8 @@ android {
         applicationId = "com.appmcpe.hub"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10
-        versionName = "0.8.0"
+        versionCode = 11
+        versionName = "0.9.0"
         buildConfigField("String", "CF_API_KEY", "\"$devApiKey\"")
         buildConfigField("String", "CF_PROXY_URL", "\"$proxyUrl\"")
         buildConfigField("String", "CF_APP_TOKEN", "\"$proxyToken\"")

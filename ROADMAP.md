@@ -35,7 +35,11 @@ Leyenda: ✅ hecho y verificado · 🟡 hecho, falta probar en teléfono · ⬜ 
   `app/build/screenshots/`); corrigió desbordes de la fuente pixelada y pestañas que no cabían
 - ⬜ Textos en inglés: los textos están dentro del código y de las capas de lógica (filtro, errores,
   avisos); traducir exige moverlos a recursos (~250 textos). Decisión pendiente.
-- ⬜ Limitar el ancho del contenido en tabletas (hoy se estira a toda la pantalla)
+- ✅ Ancho máximo de 640 dp en tabletas (columna centrada)
+- ✅ Accesibilidad: nombres para TalkBack en iconos y pestañas, zonas táctiles de 48 dp (4 pruebas)
+- ✅ Icono cambiado a la mascota Hubi: el bloque de césped anterior se parecía demasiado al de Minecraft
+- ✅ Material de Google Play generado en `store/` (icono 512, imagen destacada 1024×500, 4 capturas 1080×2160)
+  con contenido ficticio; se regenera con `gradlew testDebugUnitTest --tests "*Store*"`
 - ⬜ Sonidos (necesitan archivos de audio con licencia)
 - ⬜ Probar en dispositivos reales con Android 8 a 15
 
