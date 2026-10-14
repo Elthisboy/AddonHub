@@ -14,7 +14,7 @@ function Check($name, $expected, $actual) {
 function Status($method, $path, $token, $body) {
     $args = @("-s", "-o", "NUL", "-w", "%{http_code}", "-X", $method, "$Base$path")
     if ($token) { $args += @("-H", "X-App-Token: $token") }
-    if ($body) { $args += @("-H", "Content-Type: application/json", "-d", $body) }
+    if ($body) { $args += @("-H", "Content-Type: application/json", "-d", ($body -replace '"', '\"')) }  # PowerShell 5.1 pierde las comillas al llamar a curl.exe
     & curl.exe @args
 }
 

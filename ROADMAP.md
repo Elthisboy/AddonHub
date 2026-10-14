@@ -20,11 +20,11 @@ Leyenda: ✅ hecho y verificado · 🟡 hecho, falta probar en teléfono · ⬜ 
 - ✅ Backend (proxy) escrito y verificado: 27 pruebas con `node --test` + comprobación en vivo contra CurseForge
   (categorías, búsqueda, lote, descripción, descarga real de un .mcpack, `Range`)
 - ✅ El release no lleva la key (verificado en el APK)
-- 🙋 Desplegar el proxy (`backend/README.md`) y probarlo con `smoke-test.ps1`
+- ✅ Key de tercero aprobada por CurseForge (14 oct 2026)
+- ✅ Proxy desplegado en Cloudflare y `smoke-test.ps1` en verde; la app ya lo usa (debug y release)
 - ✅ Botón "Ver en CurseForge" en el detalle (pide PIN; solo abre enlaces de curseforge.com, con pruebas)
 - ✅ Repositorio git preparado (commit local sin secretos), README, sitio y política de privacidad en inglés
 - 🙋 Crear el repo `Elthisboy/AddonHub` en GitHub, hacer `git push` y activar Pages (`/docs`)
-- 🙋 Enviar el formulario de la key de tercero (respuestas en `docs/formulario-curseforge-respuestas.md`)
 - 🙋 Poner fecha y contacto en la política de privacidad y revisarla
 
 ## Identidad y pulido
