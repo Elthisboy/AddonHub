@@ -22,6 +22,7 @@ import com.appmcpe.hub.catalog.DepInfo
 import com.appmcpe.hub.catalog.Relation
 import com.appmcpe.hub.install.InstallSession
 import com.appmcpe.hub.install.Stage
+import com.appmcpe.hub.text.UiText
 import com.appmcpe.hub.parental.ParentalStore
 import com.appmcpe.hub.catalog.Category
 import com.appmcpe.hub.ui.AddonHubTheme
@@ -119,7 +120,10 @@ abstract class UiScreenshotsBase {
                 mod = mod,
                 description = "Este addon agrega comidas grandes. ".repeat(40),
                 loadingDescription = false,
-                requirements = listOf("Activa en Experimentos del mundo: Holiday Creator Features.", "For the addon to work, you need to download Farmer's Delight"),
+                requirements = listOf(
+                    UiText.of(R.string.req_experiments, "Holiday Creator Features"),
+                    UiText.plain("For the addon to work, you need to download Farmer's Delight"),
+                ),
                 infos = mapOf(
                     1236727 to DepInfo(1236727, farmers.name, null, farmers),
                     55 to DepInfo(55, extras.name, null, extras),
@@ -133,12 +137,12 @@ abstract class UiScreenshotsBase {
     @Test
     fun detailBlocked() = shot("03-detalle-bloqueado") {
         DetailScreen(
-            detail = DetailState(mod, description = "x", loadingDescription = false, blockReason = "No es apto para tu edad"),
+            detail = DetailState(mod, description = "x", loadingDescription = false, blockReason = UiText.of(R.string.reason_not_for_age)),
             onBack = {}, onInstall = {}, onToggleOptional = {}, onAskAdult = {}, favorite = true, onToggleFavorite = {}, onOpenCurseForge = {},
         )
     }
 
-    private fun session(stage: Stage, plan: List<String> = emptyList(), notes: List<String> = emptyList()) =
+    private fun session(stage: Stage, plan: List<String> = emptyList(), notes: List<UiText> = emptyList()) =
         InstallSession("Large Meals Bedrock (Unofficial)", null, stage, plan, notes)
 
     @Test
@@ -155,14 +159,21 @@ abstract class UiScreenshotsBase {
     @Test
     fun readyToImportWithNotes() = shot("05-listo-para-importar") {
         DownloadScreen(
-            session(Stage.ReadyToImport(2), notes = listOf("Necesita Minecraft 1.26.30 o más nuevo (tienes 1.21.50). Actualiza Minecraft en Google Play.", "Usa funciones beta: activa «APIs Beta»")),
+            session(
+                Stage.ReadyToImport(2),
+                notes = listOf(
+                    UiText.of(R.string.note_newer_minecraft, "1.26.30", "1.21.50"),
+                    UiText.of(R.string.note_beta_apis),
+                ),
+            ),
             onClose = {}, onRetry = {}, onNext = {},
         )
     }
 
     @Test
     fun error() = shot("06-error") {
-        DownloadScreen(session(Stage.Error("Sin conexión con CurseForge (SocketException: Connection reset).")), onClose = {}, onRetry = {}, onNext = {})
+        val error = UiText.of(R.string.error_no_connection, "SocketException", "Connection reset")
+        DownloadScreen(session(Stage.Error(error)), onClose = {}, onRetry = {}, onNext = {})
     }
 
     @Test
@@ -186,3 +197,10 @@ class UiScreenshotsPhone : UiScreenshotsBase()
 /** Una tableta de 10". */
 @Config(sdk = [34], qualifiers = "w800dp-h1280dp-xhdpi")
 class UiScreenshotsTablet : UiScreenshotsBase()
+
+/** Lo mismo en español, para revisar la traducción (textos más largos). */
+@Config(sdk = [34], qualifiers = "es-w320dp-h568dp-xhdpi")
+class UiScreenshotsSmallEs : UiScreenshotsBase()
+
+@Config(sdk = [34], qualifiers = "es-w360dp-h780dp-xxhdpi")
+class UiScreenshotsPhoneEs : UiScreenshotsBase()

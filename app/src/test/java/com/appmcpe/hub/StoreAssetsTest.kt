@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.Text
@@ -45,8 +44,8 @@ import com.appmcpe.hub.ui.DetailScreen
 import com.appmcpe.hub.ui.DetailState
 import com.appmcpe.hub.ui.DownloadScreen
 import com.appmcpe.hub.ui.Mascot
-import com.appmcpe.hub.ui.Mood
 import com.appmcpe.hub.ui.ModCard
+import com.appmcpe.hub.ui.Mood
 import com.appmcpe.hub.ui.ParentZoneScreen
 import com.appmcpe.hub.ui.PixelFont
 import com.appmcpe.hub.ui.Sky
@@ -60,9 +59,9 @@ import org.robolectric.annotation.GraphicsMode
 import java.io.File
 
 /**
- * Genera el material gráfico de Google Play en `store/` (icono, imagen destacada y capturas) con
- * contenido FICTICIO: no se usan logos, nombres ni imágenes reales de creadores.
- * Se regenera con:  gradlew testDebugUnitTest --tests "*StoreAssets*"
+ * Genera el material gráfico de Google Play en `store/<idioma>/` (icono, imagen destacada y capturas)
+ * con contenido FICTICIO: no se usan logos, nombres ni imágenes reales de creadores.
+ * Se regenera con:  gradlew testDebugUnitTest --tests "*Store*"
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
@@ -70,29 +69,37 @@ abstract class StoreAssetsBase {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
+    /** "es" o "en": sale del idioma con el que se ejecuta la prueba. */
+    protected val lang: String get() = rule.activity.resources.configuration.locales[0].language
+    protected val isEs: Boolean get() = lang == "es"
+
     protected fun render(path: String, content: @Composable () -> Unit) {
         rule.setContent { AddonHubTheme { Box(Modifier.fillMaxSize().background(Sky)) { content() } } }
         rule.waitForIdle()
         val root = rule.activity.window.decorView
         val bitmap = Bitmap.createBitmap(root.width, root.height, Bitmap.Config.ARGB_8888)
         root.draw(Canvas(bitmap))
-        val file = File("../store/$path").apply { parentFile!!.mkdirs() }
+        val file = File("../store/$lang/$path").apply { parentFile!!.mkdirs() }
         file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 }
 
-/** Icono de la tienda: 512×512 px. */
-@Config(sdk = [34], qualifiers = "w512dp-h512dp-mdpi")
+/** Icono de la tienda: 512×512 px (el mismo en todos los idiomas). */
+@Config(sdk = [34], qualifiers = "en-w512dp-h512dp-mdpi")
 class StoreIcon : StoreAssetsBase() {
     @Test
-    fun icon() = render("icon-512.png") {
-        Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, modifier = Modifier.fillMaxSize())
+    fun icon() {
+        render("icon-512.png") {
+            Image(painterResource(R.drawable.ic_launcher_foreground), contentDescription = null, modifier = Modifier.fillMaxSize())
+        }
+        // Una sola copia, común a los dos idiomas, en la raíz de store/.
+        File("../store/en/icon-512.png").copyTo(File("../store/icon-512.png"), overwrite = true)
+        File("../store/en/icon-512.png").delete()
     }
 }
 
-/** Imagen destacada: 1024×500 px. */
-@Config(sdk = [34], qualifiers = "w1024dp-h500dp-mdpi")
-class StoreFeatureGraphic : StoreAssetsBase() {
+abstract class StoreFeatureBase : StoreAssetsBase() {
+    /** Imagen destacada: 1024×500 px. */
     @Test
     fun feature() = render("feature-graphic-1024x500.png") {
         Row(Modifier.fillMaxSize().padding(48.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -101,36 +108,42 @@ class StoreFeatureGraphic : StoreAssetsBase() {
             Column {
                 Text("AddonHub", fontSize = 64.sp, fontFamily = PixelFont, fontWeight = FontWeight.Bold, color = DarkGreen)
                 Spacer(Modifier.height(16.dp))
-                Text(
-                    "Addons y mapas para Minecraft Bedrock",
-                    fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B3A1E),
-                )
-                Text(
-                    "en pocos toques, seguro y sin anuncios",
-                    fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B3A1E),
-                )
+                val (line1, line2) = if (isEs) {
+                    "Addons y mapas para Minecraft Bedrock" to "en pocos toques, seguro y sin anuncios"
+                } else {
+                    "Add-ons and maps for Minecraft Bedrock" to "in a few taps, safe and ad-free"
+                }
+                Text(line1, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B3A1E))
+                Text(line2, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1B3A1E))
             }
         }
     }
 }
 
+@Config(sdk = [34], qualifiers = "es-w1024dp-h500dp-mdpi")
+class StoreFeatureEs : StoreFeatureBase()
+
+@Config(sdk = [34], qualifiers = "en-w1024dp-h500dp-mdpi")
+class StoreFeatureEn : StoreFeatureBase()
+
 /** Capturas de teléfono: 1080×2160 (relación 2:1, el máximo que acepta Google Play). */
-@Config(sdk = [34], qualifiers = "w360dp-h720dp-xxhdpi")
-class StorePhoneScreenshots : StoreAssetsBase() {
+abstract class StorePhoneBase : StoreAssetsBase() {
     private fun fake(id: Int, name: String, author: String, downloads: Long, size: Long, vararg deps: CfDependency) = CfMod(
-        id = id, name = name, summary = "Contenido de ejemplo", author = author, logoUrl = null,
-        downloads = downloads, fileName = "ejemplo.mcaddon", downloadUrl = "https://example.invalid/x",
+        id = id, name = name, summary = "", author = author, logoUrl = null,
+        downloads = downloads, fileName = "example.mcaddon", downloadUrl = "https://example.invalid/x",
         sizeBytes = size, dependencies = deps.toList(),
         websiteUrl = "https://www.curseforge.com/minecraft-bedrock",
     )
 
-    private val dragons = fake(1, "Dragones Pixel", "CreadorEjemplo", 1_250_000, 8_400_000)
-    private val farm = fake(2, "Granja Feliz", "OtroCreador", 640_000, 3_100_000, CfDependency(9, Relation.REQUIRED))
-    private val island = fake(3, "Aventura en la Isla", "MapasDeEjemplo", 310_000, 22_000_000)
-    private val lib = fake(9, "Librería de Comida", "OtroCreador", 900_000, 1_500_000)
+    private val creator get() = if (isEs) "CreadorEjemplo" else "ExampleCreator"
+    private val otherCreator get() = if (isEs) "OtroCreador" else "AnotherCreator"
+    private val dragons get() = fake(1, if (isEs) "Dragones Pixel" else "Pixel Dragons", creator, 1_250_000, 8_400_000)
+    private val farm get() = fake(2, if (isEs) "Granja Feliz" else "Happy Farm", otherCreator, 640_000, 3_100_000, CfDependency(9, Relation.REQUIRED))
+    private val island get() = fake(3, if (isEs) "Aventura en la Isla" else "Island Adventure", if (isEs) "MapasDeEjemplo" else "ExampleMaps", 310_000, 22_000_000)
+    private val lib get() = fake(9, if (isEs) "Librería de Comida" else "Food Library", otherCreator, 900_000, 1_500_000)
 
     @Test
-    fun home() = render("phone/1-explorar.png") {
+    fun home() = render("phone/1-explore.png") {
         Column {
             AppHeader(adultMode = false, onAdultOff = {}, onParents = {})
             TabBar(active = 0, toolsEnabled = false, onSelect = {})
@@ -138,9 +151,9 @@ class StorePhoneScreenshots : StoreAssetsBase() {
             CategoryRow(Category.ADDONS, onSelect = {})
             Spacer(Modifier.height(8.dp))
             LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                item { Chip("🔥 Popular", true) {} }
-                item { Chip("⬇️ Más bajados", false) {} }
-                item { Chip("🆕 Nuevos", false) {} }
+                item { Chip(rule.activity.getString(R.string.sort_popular), true) {} }
+                item { Chip(rule.activity.getString(R.string.sort_downloads), false) {} }
+                item { Chip(rule.activity.getString(R.string.sort_newest), false) {} }
             }
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 ModCard(dragons, favorite = true, onToggleFavorite = {}, onOpen = {}, onInstall = {}, fallbackEmoji = "🐉")
@@ -151,11 +164,11 @@ class StorePhoneScreenshots : StoreAssetsBase() {
     }
 
     @Test
-    fun detail() = render("phone/2-detalle.png") {
+    fun detail() = render("phone/2-detail.png") {
         DetailScreen(
             detail = DetailState(
                 mod = farm,
-                description = "Una granja llena de cultivos y animales para tu mundo.",
+                description = if (isEs) "Una granja llena de cultivos y animales para tu mundo." else "A farm full of crops and animals for your world.",
                 loadingDescription = false,
                 infos = mapOf(9 to DepInfo(9, lib.name, null, lib)),
             ),
@@ -165,11 +178,11 @@ class StorePhoneScreenshots : StoreAssetsBase() {
     }
 
     @Test
-    fun downloading() = render("phone/3-descargando.png") {
+    fun downloading() = render("phone/3-downloading.png") {
         DownloadScreen(
             InstallSession(
-                "Granja Feliz", null, Stage.Downloading(1, 2, "Granja Feliz", 12_300_000, 31_000_000),
-                plan = listOf("Librería de Comida", "Granja Feliz"),
+                farm.name, null, Stage.Downloading(1, 2, farm.name, 12_300_000, 31_000_000),
+                plan = listOf(lib.name, farm.name),
             ),
             onClose = {}, onRetry = {}, onNext = {},
         )
@@ -178,6 +191,12 @@ class StorePhoneScreenshots : StoreAssetsBase() {
     @Test
     fun parents() {
         ParentalStore.init(ApplicationProvider.getApplicationContext())
-        render("phone/4-padres.png") { ParentZoneScreen(onClose = {}) }
+        render("phone/4-parents.png") { ParentZoneScreen(onClose = {}) }
     }
 }
+
+@Config(sdk = [34], qualifiers = "es-w360dp-h720dp-xxhdpi")
+class StorePhoneEs : StorePhoneBase()
+
+@Config(sdk = [34], qualifiers = "en-w360dp-h720dp-xxhdpi")
+class StorePhoneEn : StorePhoneBase()

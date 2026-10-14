@@ -38,7 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import com.appmcpe.hub.R
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -71,7 +73,7 @@ fun CatalogScreen(vm: MainViewModel) {
         OutlinedTextField(
             value = text,
             onValueChange = { text = it },
-            placeholder = { Text("Buscar contenido, creador o palabra…") },
+            placeholder = { Text(stringResource(R.string.search_placeholder)) },
             singleLine = true,
             trailingIcon = {
                 if (text.isNotEmpty() || state.query.isNotEmpty()) {
@@ -105,8 +107,13 @@ fun CatalogScreen(vm: MainViewModel) {
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                item { Chip("🌐 Buscar en todo", state.searchAll) { vm.setSearchAll(true) } }
-                item { Chip("Solo en ${state.category.label}", !state.searchAll) { vm.setSearchAll(false) } }
+                item { Chip(stringResource(R.string.search_all), state.searchAll) { vm.setSearchAll(true) } }
+                item {
+                    Chip(
+                        stringResource(R.string.search_only_in, stringResource(state.category.labelRes)),
+                        !state.searchAll,
+                    ) { vm.setSearchAll(false) }
+                }
             }
         } else {
             // Orden
@@ -114,7 +121,7 @@ fun CatalogScreen(vm: MainViewModel) {
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(Sort.entries) { s -> Chip(s.label, s == state.sort) { vm.selectSort(s) } }
+                items(Sort.entries) { s -> Chip(stringResource(s.labelRes), s == state.sort) { vm.selectSort(s) } }
             }
         }
         // Subcategorías (Terror, Magia, Aventura…)
@@ -124,16 +131,16 @@ fun CatalogScreen(vm: MainViewModel) {
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                item { Chip("Todo", state.subcategory == null) { vm.selectSubcategory(null) } }
+                item { Chip(stringResource(R.string.sub_all), state.subcategory == null) { vm.selectSubcategory(null) } }
                 items(subcategories, key = { it.id }) { sub ->
-                    Chip(sub.name, sub.id == state.subcategory?.id) { vm.selectSubcategory(sub) }
+                    Chip(sub.name.asString(), sub.id == state.subcategory?.id) { vm.selectSubcategory(sub) }
                 }
             }
         }
 
         if (state.limited) {
             Text(
-                "Mostrando solo lo más popular (la búsqueda completa no está disponible).",
+                stringResource(R.string.limited_notice),
                 fontSize = 12.sp,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
             )
@@ -151,7 +158,7 @@ fun CatalogScreen(vm: MainViewModel) {
                         val tier = SearchRanker.tierOf(mod, state.query)
                         if (i == 0 || tier != SearchRanker.tierOf(state.mods[i - 1], state.query)) {
                             Text(
-                                tier.label,
+                                stringResource(tier.labelRes),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont,
                                 color = DarkGreen,
@@ -173,25 +180,25 @@ fun CatalogScreen(vm: MainViewModel) {
                     when {
                         state.loading -> CircularProgressIndicator()
                         state.error != null -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("❌ ${state.error}", color = Color(0xFFC62828), fontSize = 16.sp)
+                            Text(stringResource(R.string.error_with_icon, state.error!!.asString()), color = Color(0xFFC62828), fontSize = 16.sp)
                             Spacer(Modifier.height(8.dp))
                             Button(onClick = { vm.loadCatalog(reset = state.mods.isEmpty()) }) {
-                                Text("Reintentar")
+                                Text(stringResource(R.string.retry))
                             }
                         }
                         state.blockedQuery -> Text(
-                            "Esa búsqueda no está disponible 🔒\nProbá con otra palabra.",
+                            stringResource(R.string.blocked_search),
                             fontSize = 16.sp,
                         )
                         state.mods.isEmpty() -> Text(
-                            if (searching) "No encontramos «${state.query}» 😕\nProbá con otra palabra."
-                            else "No encontramos nada 😕",
+                            if (searching) stringResource(R.string.no_results_for, state.query)
+                            else stringResource(R.string.no_results),
                             fontSize = 16.sp,
                         )
                         state.hasMore -> Button(
                             onClick = vm::loadMore,
                             colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
-                        ) { Text("Ver más") }
+                        ) { Text(stringResource(R.string.load_more)) }
                     }
                 }
             }
@@ -219,7 +226,7 @@ fun CategoryRow(selected: Category, onSelect: (Category) -> Unit) {
             ) {
                 Text(c.emoji, fontSize = 24.sp)
                 Text(
-                    c.label,
+                    stringResource(c.labelRes),
                     fontSize = 9.sp, // la fuente pixelada es ancha: con más tamaño "TEXTURAS" no cabe en 320 dp
                     fontWeight = FontWeight.Bold,
                     fontFamily = PixelFont,
@@ -251,12 +258,13 @@ fun Chip(text: String, selected: Boolean, onClick: () -> Unit) {
 /** Corazón para marcar un contenido como favorito. */
 @Composable
 fun FavoriteHeart(favorite: Boolean, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+    val description = stringResource(if (favorite) R.string.fav_remove else R.string.fav_add)
     Box(
         modifier
             .size(48.dp) // 48 dp: tamaño mínimo recomendado para zonas táctiles
             .clip(RoundedCornerShape(24.dp))
             .semantics {
-                contentDescription = if (favorite) "Quitar de favoritos" else "Añadir a favoritos"
+                contentDescription = description
                 role = Role.Button
             }
             .clickable(onClick = onToggle),
@@ -309,16 +317,16 @@ fun ModCard(
                     overflow = TextOverflow.Ellipsis,
                 )
                 if (mod.author.isNotBlank()) {
-                    Text("por ${mod.author}", fontSize = 13.sp, color = Color.Gray, maxLines = 1)
+                    Text(stringResource(R.string.by_author, mod.author), fontSize = 13.sp, color = Color.Gray, maxLines = 1)
                 }
                 Text(
-                    "⬇ ${compactCount(mod.downloads)} · ${contentType(mod.fileName)} · ${formatSize(mod.sizeBytes)}",
+                    "⬇ ${compactCount(mod.downloads)} · ${stringResource(contentTypeRes(mod.fileName))} · ${formatSize(mod.sizeBytes)}",
                     fontSize = 12.sp,
                     color = DarkGreen,
                     fontWeight = FontWeight.Bold,
                 )
                 if (mod.dependencies.any { it.type == Relation.REQUIRED }) {
-                    Text("🔗 Necesita otros contenidos", fontSize = 13.sp, color = Color(0xFF8D6E00), fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.needs_others), fontSize = 13.sp, color = Color(0xFF8D6E00), fontWeight = FontWeight.Bold)
                 }
                 note?.let { Text(it, fontSize = 12.sp, color = Color.Gray) }
             }
@@ -333,14 +341,14 @@ fun ModCard(
                 shape = RoundedCornerShape(16.dp),
                 contentPadding = tight,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8F5E9), contentColor = DarkGreen),
-            ) { Text("👀 VER", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, maxLines = 1) }
+            ) { Text(stringResource(R.string.btn_view), fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, maxLines = 1) }
             Button(
                 onClick = onInstall,
                 modifier = Modifier.weight(1.4f).height(52.dp),
                 shape = RoundedCornerShape(16.dp),
                 contentPadding = tight,
                 colors = ButtonDefaults.buttonColors(containerColor = Green),
-            ) { Text("⬇️ INSTALAR", fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, maxLines = 1) }
+            ) { Text(stringResource(R.string.btn_install), fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, maxLines = 1) }
         }
     }
 }

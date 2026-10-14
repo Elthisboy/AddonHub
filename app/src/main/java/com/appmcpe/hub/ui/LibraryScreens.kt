@@ -25,9 +25,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.appmcpe.hub.R
 import java.text.DateFormat
 import java.util.Date
+
+@Composable
+private fun installedOn(date: String): String = stringResource(R.string.installed_on, date)
 
 /** Pestaña ❤️ Favoritos. Solo guarda ids; los datos se piden en vivo. */
 @Composable
@@ -42,8 +47,8 @@ fun FavoritesScreen(vm: MainViewModel) {
         vm = vm,
         state = state,
         favorites = ids,
-        emptyTitle = "Aún no tienes favoritos",
-        emptyText = "Toca el 🤍 de cualquier contenido para guardarlo aquí.",
+        emptyTitle = stringResource(R.string.fav_empty_title),
+        emptyText = stringResource(R.string.fav_empty_text),
         noteFor = { null },
         footer = null,
     )
@@ -65,11 +70,11 @@ fun DownloadsScreen(vm: MainViewModel) {
         vm = vm,
         state = state,
         favorites = favorites,
-        emptyTitle = "Todavía no has instalado nada",
-        emptyText = "Lo que instales aparecerá aquí por si quieres volver a ponerlo.",
-        noteFor = { mod -> dates[mod.id]?.let { "Instalado el ${format.format(Date(it))}" } },
+        emptyTitle = stringResource(R.string.hist_empty_title),
+        emptyText = stringResource(R.string.hist_empty_text),
+        noteFor = { mod -> dates[mod.id]?.let { installedOn(format.format(Date(it))) } },
         footer = if (history.isNotEmpty()) {
-            { OutlinedButton(onClick = vm::clearHistory, modifier = Modifier.fillMaxWidth()) { Text("🗑️ Borrar historial") } }
+            { OutlinedButton(onClick = vm::clearHistory, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.hist_clear)) } }
         } else null,
     )
 }
@@ -81,7 +86,7 @@ private fun LibraryList(
     favorites: List<Int>,
     emptyTitle: String,
     emptyText: String,
-    noteFor: (com.appmcpe.hub.catalog.CfMod) -> String?,
+    noteFor: @Composable (com.appmcpe.hub.catalog.CfMod) -> String?,
     footer: (@Composable () -> Unit)?,
 ) {
     LazyColumn(
@@ -104,9 +109,9 @@ private fun LibraryList(
                 when {
                     state.loading && state.mods.isEmpty() -> CircularProgressIndicator()
                     state.error != null -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("❌ ${state.error}", color = Color(0xFFC62828), fontSize = 16.sp)
+                        Text(stringResource(R.string.error_with_icon, state.error!!.asString()), color = Color(0xFFC62828), fontSize = 16.sp)
                         Spacer(Modifier.height(8.dp))
-                        Button(onClick = { vm.loadFavorites(); vm.loadHistory() }) { Text("Reintentar") }
+                        Button(onClick = { vm.loadFavorites(); vm.loadHistory() }) { Text(stringResource(R.string.retry)) }
                     }
                     state.mods.isEmpty() -> Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -123,7 +128,7 @@ private fun LibraryList(
         if (state.hidden > 0) {
             item {
                 Text(
-                    "${state.hidden} guardado(s) no se muestran: ya no están disponibles o el filtro de edad los oculta.",
+                    stringResource(R.string.lib_hidden, state.hidden),
                     fontSize = 12.sp,
                     color = Color(0xFF37474F),
                 )

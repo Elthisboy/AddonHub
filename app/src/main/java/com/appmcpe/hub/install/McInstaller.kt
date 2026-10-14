@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.core.content.FileProvider
+import com.appmcpe.hub.R
+import com.appmcpe.hub.text.UiText
+import com.appmcpe.hub.text.UiIOException
 import java.io.File
 
 /** Formatos que Minecraft Bedrock sabe importar. */
@@ -43,7 +46,7 @@ object McInstaller {
      */
     fun install(context: Context, file: File): Result<Unit> {
         if (!isMinecraftInstalled(context)) {
-            return Result.failure(IllegalStateException("Minecraft no está instalado"))
+            return Result.failure(UiIOException(UiText.of(R.string.error_minecraft_missing)))
         }
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
 
@@ -62,7 +65,7 @@ object McInstaller {
             context.startActivity(intent)
             Result.success(Unit)
         } catch (e: ActivityNotFoundException) {
-            Result.failure(e)
+            Result.failure(UiIOException(UiText.of(R.string.error_minecraft_open), e))
         }
     }
 }

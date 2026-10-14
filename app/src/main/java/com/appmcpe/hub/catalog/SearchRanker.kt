@@ -1,5 +1,7 @@
 package com.appmcpe.hub.catalog
 
+import androidx.annotation.StringRes
+import com.appmcpe.hub.R
 import java.text.Normalizer
 
 /**
@@ -7,10 +9,10 @@ import java.text.Normalizer
  * 1) el nombre del contenido, 2) el creador, 3) palabras clave (resumen/descripción).
  */
 object SearchRanker {
-    enum class Tier(val label: String) {
-        CONTENT("📦 Contenido"),
-        CREATOR("👤 Creador"),
-        KEYWORD("🔎 Palabras clave"),
+    enum class Tier(@StringRes val labelRes: Int) {
+        CONTENT(R.string.tier_content),
+        CREATOR(R.string.tier_creator),
+        KEYWORD(R.string.tier_keyword),
     }
 
     /** Minúsculas, sin tildes ni emojis ni signos: "🍲Large  Meals!" → "large meals". */

@@ -54,7 +54,7 @@ object Http {
             val host = java.net.URI(url).host
             Dns.SYSTEM.lookup(host).joinToString { if (it is Inet6Address) "v6" else "v4" }
         } catch (e: Exception) {
-            "DNS falló: ${e.javaClass.simpleName}"
+            "DNS failed: ${e.javaClass.simpleName}"
         }
         val req = Request.Builder().url(url).header("User-Agent", USER_AGENT).apply {
             if (withKey) Backend.authorize(this)

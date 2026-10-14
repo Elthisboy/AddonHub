@@ -1,5 +1,7 @@
 package com.appmcpe.hub.ui
 
+import androidx.annotation.StringRes
+import com.appmcpe.hub.R
 import java.util.Locale
 
 fun compactCount(n: Long): String = when {
@@ -14,11 +16,12 @@ fun formatSize(bytes: Long): String = when {
     else -> ""
 }
 
-/** Nombre amigable del tipo de contenido según la extensión del archivo. */
-fun contentType(fileName: String): String = when (fileName.substringAfterLast('.', "").lowercase()) {
-    "mcaddon" -> "Addon"
-    "mcpack" -> "Pack"
-    "mcworld" -> "Mundo"
-    "mctemplate" -> "Plantilla"
-    else -> "Archivo"
+/** Nombre amigable (traducible) del tipo de contenido según la extensión del archivo. */
+@StringRes
+fun contentTypeRes(fileName: String): Int = when (fileName.substringAfterLast('.', "").lowercase()) {
+    "mcaddon" -> R.string.type_addon
+    "mcpack" -> R.string.type_pack
+    "mcworld" -> R.string.type_world
+    "mctemplate" -> R.string.type_template
+    else -> R.string.type_file
 }

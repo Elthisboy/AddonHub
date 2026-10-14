@@ -1,8 +1,12 @@
 package com.appmcpe.hub.catalog
 
+import androidx.annotation.StringRes
+import com.appmcpe.hub.R
 import com.appmcpe.hub.download.Backend
 import com.appmcpe.hub.download.Http
 import com.appmcpe.hub.install.ALLOWED_EXTENSIONS
+import com.appmcpe.hub.text.UiText
+import com.appmcpe.hub.text.UiTextProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -13,22 +17,23 @@ import org.json.JSONObject
 import java.io.IOException
 
 /** Categorías principales de Minecraft Bedrock en CurseForge (classId). */
-enum class Category(val classId: Int, val label: String, val emoji: String) {
-    ADDONS(4984, "Addons", "🧩"),
-    MAPS(6913, "Mapas", "🗺️"),
-    TEXTURES(6929, "Texturas", "🎨"),
-    SKINS(6925, "Skins", "🧑"),
+enum class Category(val classId: Int, @StringRes val labelRes: Int, val emoji: String) {
+    ADDONS(4984, R.string.cat_addons, "🧩"),
+    MAPS(6913, R.string.cat_maps, "🗺️"),
+    TEXTURES(6929, R.string.cat_textures, "🎨"),
+    SKINS(6925, R.string.cat_skins, "🧑"),
 }
 
 /** Orden del catálogo. [field] es el sortField de CurseForge. */
-enum class Sort(val field: Int, val label: String) {
-    POPULAR(2, "🔥 Popular"),
-    DOWNLOADS(6, "⬇️ Más bajados"),
-    NEWEST(11, "🆕 Nuevos"),
-    UPDATED(3, "🔄 Actualizados"),
+enum class Sort(val field: Int, @StringRes val labelRes: Int) {
+    POPULAR(2, R.string.sort_popular),
+    DOWNLOADS(6, R.string.sort_downloads),
+    NEWEST(11, R.string.sort_newest),
+    UPDATED(3, R.string.sort_updated),
 }
 
-data class Subcategory(val id: Int, val name: String, val classId: Int, val slug: String = "")
+/** [name] es traducible si se conoce la subcategoría; si no, queda el nombre original de CurseForge. */
+data class Subcategory(val id: Int, val name: UiText, val classId: Int, val slug: String = "")
 
 /** Tipos de relación de CurseForge entre archivos (relationType). */
 object Relation {
@@ -87,7 +92,8 @@ data class CatalogPage(
     val nextIndex: Int = 0,
 )
 
-class CurseForgeException(message: String, val code: Int = 0) : IOException(message)
+class CurseForgeException(override val text: UiText, val code: Int = 0) :
+    IOException(text.toString()), UiTextProvider
 
 object CurseForgeApi {
     /** Con proxy: nuestro servidor; sin proxy (desarrollo): CurseForge directo. */
@@ -99,18 +105,20 @@ object CurseForgeApi {
     private const val SEARCH_PAGES = 3 // 3 × 50 resultados por búsqueda, ordenados juntos
     private const val SEARCH_SORT = 2 // popularidad: lo mejor de cada nivel sale primero
 
-    /** Nombres en español para las subcategorías más comunes (por slug). */
-    private val ES_NAMES = mapOf(
-        "survival" to "Supervivencia", "horror" to "Terror", "magic" to "Magia",
-        "adventure" to "Aventura", "puzzle" to "Rompecabezas", "pvp" to "PvP",
-        "mobs" to "Mobs", "players" to "Jugadores", "fantasy" to "Fantasía",
-        "technology" to "Tecnología", "utility" to "Utilidad", "roleplay" to "Rol",
-        "multiplayer" to "Multijugador", "food" to "Comida", "realistic" to "Realista",
-        "simplistic" to "Simple", "themed" to "Temático", "minigame" to "Minijuegos",
-        "creation" to "Creación", "miscellaneous" to "Varios", "cosmetics" to "Cosméticos",
-        "performance" to "Rendimiento", "vanilla" to "Vanilla+", "custom-terrain" to "Terreno",
-        "armor-tools-and-weapons" to "Armas y herramientas", "rollercoaster" to "Montañas rusas",
-        "enhanced-visuals" to "Visuales", "gui" to "Interfaz", "skin-packs" to "Skin packs",
+    /** Nombres traducibles de las subcategorías más comunes (por slug de CurseForge). */
+    private val SUBCATEGORY_NAMES = mapOf(
+        "survival" to R.string.sub_survival, "horror" to R.string.sub_horror, "magic" to R.string.sub_magic,
+        "adventure" to R.string.sub_adventure, "puzzle" to R.string.sub_puzzle, "pvp" to R.string.sub_pvp,
+        "mobs" to R.string.sub_mobs, "players" to R.string.sub_players, "fantasy" to R.string.sub_fantasy,
+        "technology" to R.string.sub_technology, "utility" to R.string.sub_utility, "roleplay" to R.string.sub_roleplay,
+        "multiplayer" to R.string.sub_multiplayer, "food" to R.string.sub_food, "realistic" to R.string.sub_realistic,
+        "simplistic" to R.string.sub_simplistic, "themed" to R.string.sub_themed, "minigame" to R.string.sub_minigame,
+        "creation" to R.string.sub_creation, "miscellaneous" to R.string.sub_miscellaneous,
+        "cosmetics" to R.string.sub_cosmetics, "performance" to R.string.sub_performance,
+        "vanilla" to R.string.sub_vanilla, "custom-terrain" to R.string.sub_custom_terrain,
+        "armor-tools-and-weapons" to R.string.sub_armor_tools, "rollercoaster" to R.string.sub_rollercoaster,
+        "enhanced-visuals" to R.string.sub_enhanced_visuals, "gui" to R.string.sub_gui,
+        "skin-packs" to R.string.sub_skin_packs,
     )
 
     private fun request(url: String, post: String? = null): String {
@@ -120,15 +128,14 @@ object CurseForgeApi {
         if (post != null) builder.post(post.toRequestBody("application/json".toMediaType()))
         try {
             return Http.execute(builder.build()) { r ->
-                if (!r.isSuccessful) throw CurseForgeException("CurseForge respondió ${r.code}", r.code)
-                r.body?.string() ?: throw CurseForgeException("Respuesta vacía")
+                if (!r.isSuccessful) throw CurseForgeException(UiText.of(R.string.error_curseforge_status, r.code), r.code)
+                r.body?.string() ?: throw CurseForgeException(UiText.of(R.string.error_empty_response))
             }
         } catch (e: CurseForgeException) {
             throw e
         } catch (e: IOException) {
             throw CurseForgeException(
-                "Sin conexión con CurseForge (${e.javaClass.simpleName}: ${e.message}). " +
-                    "Prueba Herramientas → Probar conexión.",
+                UiText.of(R.string.error_no_connection, e.javaClass.simpleName, e.message.orEmpty()),
             )
         }
     }
@@ -202,9 +209,12 @@ object CurseForgeApi {
             if (c.optBoolean("isClass") || c.optInt("parentCategoryId") != classId) continue
             val slug = c.optString("slug")
             if (slug.startsWith("modjam")) continue
-            out += Subcategory(c.getInt("id"), ES_NAMES[slug] ?: c.optString("name"), classId, slug)
+            val original = c.optString("name")
+            val name = SUBCATEGORY_NAMES[slug]?.let { UiText.of(it) } ?: UiText.plain(original)
+            out += Subcategory(c.getInt("id"), name, classId, slug)
         }
-        out.sortedBy { it.name }
+        // Se ordena por el nombre original (inglés) porque el traducido aún no se conoce aquí.
+        out.sortedBy { it.slug }
     }
 
     /**
@@ -220,7 +230,7 @@ object CurseForgeApi {
         searchAll: Boolean = true,
     ): CatalogPage = withContext(Dispatchers.IO) {
         if (!Backend.configured) {
-            throw CurseForgeException("Falta configurar el servidor o la API key de CurseForge")
+            throw CurseForgeException(UiText.of(R.string.error_not_configured))
         }
         try {
             if (query.isBlank()) browse(category, subcategory, sort, index)
@@ -270,7 +280,8 @@ object CurseForgeApi {
                 extraIndexes.map { i -> pool.submit<RawPage> { fetchPage(category, subcategory, SEARCH_SORT, query, i) } }
                     .map { it.get() }
             } catch (e: java.util.concurrent.ExecutionException) {
-                throw (e.cause as? CurseForgeException) ?: CurseForgeException("No se pudo buscar: ${e.cause?.message}")
+                throw (e.cause as? CurseForgeException)
+                    ?: CurseForgeException(UiText.of(R.string.error_search_failed, e.cause?.message.orEmpty()))
             } finally {
                 pool.shutdown()
             }

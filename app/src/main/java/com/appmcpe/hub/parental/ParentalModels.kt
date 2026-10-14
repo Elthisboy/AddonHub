@@ -1,13 +1,16 @@
 package com.appmcpe.hub.parental
 
+import androidx.annotation.StringRes
+import com.appmcpe.hub.R
+
 /** Perfiles por edad. Cada uno bloquea más o menos tipos de contenido (ver [ContentTerms]). */
-enum class AgeGroup(val label: String, val emoji: String, val description: String) {
-    KIDS("6 a 9 años", "🧒", "Sin terror, sangre, armas ni violencia."),
-    PRE("10 a 12 años", "🧑", "Sin terror, sangre, drogas ni alcohol. Permite armas y aventuras."),
-    TEEN("13 a 15 años", "😎", "Permite terror y acción. Sin drogas, alcohol ni apuestas."),
+enum class AgeGroup(@StringRes val labelRes: Int, val emoji: String, @StringRes val descriptionRes: Int) {
+    KIDS(R.string.age_kids, "🧒", R.string.age_kids_desc),
+    PRE(R.string.age_pre, "🧑", R.string.age_pre_desc),
+    TEEN(R.string.age_teen, "😎", R.string.age_teen_desc),
 
     /** Solo se activa desde el modo adulto escondido; no aparece en la lista de edades. */
-    ADULT("Adulto (18+)", "🔓", "Sin filtro de edad. Lo sexual sigue bloqueado siempre.");
+    ADULT(R.string.age_adult, "🔓", R.string.age_adult_desc);
 
     companion object {
         /** Las edades que un adulto puede elegir normalmente. */

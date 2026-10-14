@@ -34,7 +34,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import com.appmcpe.hub.R
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -60,6 +62,7 @@ fun DetailScreen(
     onOpenCurseForge: () -> Unit,
 ) {
     val mod = detail.mod
+    val backLabel = stringResource(R.string.back)
     BackHandler(onBack = onBack)
 
     val required = InstallPlan.required(mod, detail.infos, detail.selectedOptional)
@@ -86,11 +89,11 @@ fun DetailScreen(
                     .height(48.dp)
                     .clip(RoundedCornerShape(24.dp))
                     .background(Color.White)
-                    .semantics { contentDescription = "Volver"; role = Role.Button }
+                    .semantics { contentDescription = backLabel; role = Role.Button }
                     .clickable(onClick = onBack)
                     .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.Center,
-            ) { Text("← Volver", fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = PixelFont, color = DarkGreen) }
+            ) { Text("← $backLabel", fontSize = 13.sp, fontWeight = FontWeight.Bold, fontFamily = PixelFont, color = DarkGreen) }
             Spacer(Modifier.weight(1f))
             FavoriteHeart(favorite, onToggleFavorite, Modifier.background(Color.White, RoundedCornerShape(20.dp)))
         }
@@ -109,7 +112,7 @@ fun DetailScreen(
                     items(images) { url ->
                         AsyncImage(
                             model = url,
-                            contentDescription = "Imagen de ${mod.name}",
+                            contentDescription = stringResource(R.string.image_of, mod.name),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .size(width = 300.dp, height = 170.dp)
@@ -122,11 +125,11 @@ fun DetailScreen(
 
             // Nombre de terceros: fuente normal (la pixelada es muy ancha para nombres largos).
             Text(mod.name, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = DarkGreen)
-            if (mod.author.isNotBlank()) Text("por ${mod.author}", fontSize = 15.sp, color = Color(0xFF37474F))
+            if (mod.author.isNotBlank()) Text(stringResource(R.string.by_author, mod.author), fontSize = 15.sp, color = Color(0xFF37474F))
             if (mod.websiteUrl.isNotBlank()) {
                 // Enlace de vuelta al autor en CurseForge; pide el PIN porque es una salida de la app.
                 Text(
-                    "🔒 Ver en CurseForge (solo adultos)",
+                    stringResource(R.string.detail_open_curseforge),
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                     color = DarkGreen,
@@ -139,30 +142,29 @@ fun DetailScreen(
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 InfoChip("⬇ ${compactCount(mod.downloads)}")
-                InfoChip("🧩 ${contentType(mod.fileName)}")
+                InfoChip("🧩 ${stringResource(contentTypeRes(mod.fileName))}")
                 formatSize(mod.sizeBytes).takeIf { it.isNotEmpty() }?.let { InfoChip("📦 $it") }
             }
 
-            Section("📥 Lo que se va a descargar") {
+            Section(stringResource(R.string.sec_download)) {
                 Text(mod.fileName, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(4.dp))
                 if (extraCount > 0) {
-                    Text("+ $extraCount contenido(s) más que necesita", fontSize = 14.sp, color = DarkGreen)
+                    Text(stringResource(R.string.extra_needed, extraCount), fontSize = 14.sp, color = DarkGreen)
                     Spacer(Modifier.height(4.dp))
                 }
                 Text(
-                    "Al terminar, se abrirá Minecraft para importarlo automáticamente.",
+                    stringResource(R.string.install_note),
                     fontSize = 14.sp,
                 )
             }
 
             // Siempre se muestra, para que quede claro que sí se revisó.
             run {
-                Section("🔗 Otros contenidos") {
+                Section(stringResource(R.string.sec_others)) {
                     if (!hasDeps) {
                         Text(
-                            "El autor no declara que necesite otros contenidos. " +
-                                "Al instalar también revisamos el interior del archivo.",
+                            stringResource(R.string.no_deps),
                             fontSize = 14.sp,
                         )
                     }
@@ -170,31 +172,31 @@ fun DetailScreen(
                         detail.loadingDeps -> Row(verticalAlignment = Alignment.CenterVertically) {
                             CircularProgressIndicator(Modifier.size(22.dp), strokeWidth = 3.dp)
                             Spacer(Modifier.width(10.dp))
-                            Text("Revisando qué más necesita…", fontSize = 14.sp)
+                            Text(stringResource(R.string.checking_deps), fontSize = 14.sp)
                         }
                         detail.depsError -> Text(
-                            "No pudimos revisar sus dependencias. Se intentará de nuevo al instalar.",
+                            stringResource(R.string.deps_error),
                             fontSize = 14.sp,
                         )
                         else -> Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             if (required.isNotEmpty()) {
-                                DepGroup("Necesario (se instala solo)")
+                                DepGroup(stringResource(R.string.dep_required))
                                 required.forEach { DepRow(it, null, null) }
                             }
                             if (unavailable.isNotEmpty()) {
-                                DepGroup("⚠️ No se puede descargar desde aquí")
+                                DepGroup(stringResource(R.string.dep_unavailable))
                                 unavailable.forEach {
-                                    Text("• ${it.name} — búscalo en CurseForge", fontSize = 14.sp)
+                                    Text(stringResource(R.string.dep_unavailable_item, it.name), fontSize = 14.sp)
                                 }
                             }
                             if (optional.isNotEmpty()) {
-                                DepGroup("Opcional (tú eliges)")
+                                DepGroup(stringResource(R.string.dep_optional))
                                 optional.forEach { dep ->
                                     DepRow(dep, dep.id in detail.selectedOptional) { onToggleOptional(dep.id) }
                                 }
                             }
                             if (incompatible.isNotEmpty()) {
-                                DepGroup("🚫 No lo mezcles con")
+                                DepGroup(stringResource(R.string.dep_incompatible))
                                 incompatible.forEach { Text("• ${it.name}", fontSize = 14.sp) }
                             }
                         }
@@ -204,21 +206,21 @@ fun DetailScreen(
 
             // Requisitos que el autor menciona en la descripción pero no declaró como dependencia.
             if (detail.requirements.isNotEmpty()) {
-                Section("⚙️ Lo que pide el autor") {
+                Section(stringResource(R.string.sec_author_asks)) {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        detail.requirements.forEach { Text("• $it", fontSize = 14.sp) }
+                        detail.requirements.forEach { Text("• ${it.asString()}", fontSize = 14.sp) }
                     }
                 }
             }
 
             if (mod.summary.isNotBlank()) {
-                Section("📝 Resumen") { Text(mod.summary, fontSize = 16.sp) }
+                Section(stringResource(R.string.sec_summary)) { Text(mod.summary, fontSize = 16.sp) }
             }
 
-            Section("📖 Descripción") {
+            Section(stringResource(R.string.sec_description)) {
                 when {
                     detail.loadingDescription -> CircularProgressIndicator(Modifier.size(28.dp))
-                    detail.description.isNullOrBlank() -> Text("No hay descripción disponible.", fontSize = 14.sp)
+                    detail.description.isNullOrBlank() -> Text(stringResource(R.string.no_description), fontSize = 14.sp)
                     else -> ExpandableText(detail.description)
                 }
             }
@@ -228,11 +230,11 @@ fun DetailScreen(
         Box(Modifier.padding(16.dp)) {
             when {
                 detail.blockReason != null && detail.blockIsPermanent ->
-                    BigButton("🔒 ${detail.blockReason}", Color.Gray, enabled = false) {}
+                    BigButton("🔒 ${detail.blockReason.asString()}", Color.Gray, enabled = false) {}
                 detail.blockReason != null ->
-                    BigButton("🔒 ${detail.blockReason} · Pedir permiso", Color(0xFFEF6C00), onClick = onAskAdult)
+                    BigButton(stringResource(R.string.btn_ask_permission, detail.blockReason.asString()), Color(0xFFEF6C00), onClick = onAskAdult)
                 else -> BigButton(
-                    if (extraCount > 0) "⬇️ INSTALAR TODO (${extraCount + 1})" else "⬇️ INSTALAR",
+                    if (extraCount > 0) stringResource(R.string.btn_install_all, extraCount + 1) else stringResource(R.string.btn_install),
                     Green,
                     enabled = !detail.loadingDeps,
                     onClick = onInstall,
@@ -281,7 +283,7 @@ private fun ExpandableText(text: String) {
     )
     if (long) {
         Text(
-            if (expanded) "Ver menos ▲" else "Leer más ▼",
+            if (expanded) stringResource(R.string.read_less) else stringResource(R.string.read_more),
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             color = DarkGreen,

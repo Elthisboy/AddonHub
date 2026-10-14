@@ -37,8 +37,8 @@ android {
         applicationId = "com.appmcpe.hub"
         minSdk = 26
         targetSdk = 35
-        versionCode = 11
-        versionName = "0.9.0"
+        versionCode = 12
+        versionName = "0.10.0"
         buildConfigField("String", "CF_API_KEY", "\"$devApiKey\"")
         buildConfigField("String", "CF_PROXY_URL", "\"$proxyUrl\"")
         buildConfigField("String", "CF_APP_TOKEN", "\"$proxyToken\"")
@@ -71,6 +71,11 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+    }
+    // Solo se empaquetan los idiomas que la app traduce (las librerías traen decenas más).
+    // El inglés es el idioma por defecto cuando el teléfono está en otro idioma.
+    androidResources {
+        localeFilters += listOf("en", "es")
     }
     buildFeatures {
         compose = true

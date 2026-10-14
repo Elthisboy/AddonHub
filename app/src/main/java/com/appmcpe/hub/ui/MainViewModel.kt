@@ -27,6 +27,10 @@ import com.appmcpe.hub.parental.ParentalStore
 import com.appmcpe.hub.parental.Verdict
 import com.appmcpe.hub.user.HistoryEntry
 import com.appmcpe.hub.user.UserLists
+import com.appmcpe.hub.R
+import com.appmcpe.hub.text.UiText
+import com.appmcpe.hub.text.UiTextProvider
+import com.appmcpe.hub.text.toUiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -44,13 +48,13 @@ data class DetailState(
     val description: String? = null,
     val loadingDescription: Boolean = true,
     /** Cosas que el autor pide en la descripción (experimentos, "necesitas instalar X"…). */
-    val requirements: List<String> = emptyList(),
+    val requirements: List<UiText> = emptyList(),
     val loadingDeps: Boolean = false,
     val depsError: Boolean = false,
     val infos: Map<Int, DepInfo> = emptyMap(),
     val selectedOptional: Set<Int> = emptySet(),
     /** Motivo por el que el filtro de edad bloquea este contenido, o null si se puede instalar. */
-    val blockReason: String? = null,
+    val blockReason: UiText? = null,
     /** El bloqueo es de contenido para adultos y ni un PIN lo puede levantar. */
     val blockIsPermanent: Boolean = false,
 )
@@ -69,7 +73,7 @@ data class CatalogState(
     val loading: Boolean = false,
     val hasMore: Boolean = false,
     val limited: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
     /** La búsqueda escrita contiene algo que el filtro de edad no permite. */
     val blockedQuery: Boolean = false,
 )
@@ -78,13 +82,13 @@ data class CatalogState(
 data class LibraryState(
     val mods: List<CfMod> = emptyList(),
     val loading: Boolean = false,
-    val error: String? = null,
+    val error: UiText? = null,
     /** Cuántos guardados ya no están disponibles (borrados, bloqueados por edad…). */
     val hidden: Int = 0,
 )
 
 /** Se lanza cuando el filtro de edad impide instalar algo. El mensaje se muestra al niño. */
-class ContentBlockedException(message: String) : Exception(message)
+class ContentBlockedException(override val text: UiText) : Exception(text.toString()), UiTextProvider
 
 class MainViewModel(app: Application) : AndroidViewModel(app) {
     private val _catalog = MutableStateFlow(CatalogState())
@@ -140,7 +144,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                target.value = LibraryState(error = e.message ?: "No se pudo cargar")
+                target.value = LibraryState(error = e.toUiText())
             }
         }
     }
@@ -243,7 +247,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             } catch (e: Exception) {
                 _catalog.value = _catalog.value.copy(
                     loading = false,
-                    error = e.message ?: "No se pudo cargar el catálogo",
+                    error = e.toUiText(),
                 )
             }
         }
@@ -261,7 +265,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
         detailJob = viewModelScope.launch {
             var text: String? = null
-            var requirements = emptyList<String>()
+            var requirements = emptyList<UiText>()
             var verdict = Verdict.OK
             try {
                 val html = CurseForgeApi.description(mod.id)
@@ -360,7 +364,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
             // Desde la tarjeta no se vio la descripción: se revisa antes de bajar nada.
             val settings = ParentalStore.settings.value
             if (ContentFilter.check(mod, settings).blocked) {
-                throw ContentBlockedException("🔒 Este contenido no está permitido para ti.")
+                throw ContentBlockedException(UiText.of(R.string.blocked_not_allowed))
             }
             if (checkDescription) {
                 val text = try {
@@ -371,16 +375,14 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     null // sin descripción no hay nada más que revisar
                 }
                 if (text != null && ContentFilter.checkDescription(text, mod, settings).blocked) {
-                    throw ContentBlockedException(
-                        "🔒 Este contenido necesita permiso de un adulto. Ábrelo con «VER» y pídelo ahí.",
-                    )
+                    throw ContentBlockedException(UiText.of(R.string.blocked_needs_adult))
                 }
             }
             val infos = known
                 ?: if (hasDependencies(mod)) CurseForgeApi.resolveDependencies(mod) else emptyMap()
 
             val notes = InstallPlan.unavailable(mod, infos, optional).map {
-                "Necesita «${it.name}», que no se puede descargar desde aquí. Búscalo en CurseForge."
+                UiText.of(R.string.note_dependency_unavailable, it.name)
             }
             val items = InstallPlan.buildPlan(mod, infos, optional).map { m ->
                 InstallItem(m.name, modId = m.id) { progress ->
@@ -393,22 +395,24 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun installTestPack() {
         val ctx = getApplication<Application>()
-        InstallManager.start("Pack de prueba", null, retry = ::installTestPack) {
-            InstallSpec(listOf(InstallItem("Pack de prueba") { Downloader.copyTestPack(ctx) }))
+        val title = ctx.getString(R.string.tool_test_pack_title)
+        InstallManager.start(title, null, retry = ::installTestPack) {
+            InstallSpec(listOf(InstallItem(title) { Downloader.copyTestPack(ctx) }))
         }
     }
 
     fun installFromUrl(url: String) {
         val ctx = getApplication<Application>()
-        InstallManager.start("Descarga por enlace", null, retry = { installFromUrl(url) }) {
-            InstallSpec(listOf(InstallItem("Archivo") { progress -> Downloader.download(ctx, url.trim(), null, progress) }))
+        val title = ctx.getString(R.string.tool_link_title)
+        InstallManager.start(title, null, retry = { installFromUrl(url) }) {
+            InstallSpec(listOf(InstallItem(ctx.getString(R.string.tool_file_item)) { progress -> Downloader.download(ctx, url.trim(), null, progress) }))
         }
     }
 
     fun installFromUri(uri: Uri) {
         val ctx = getApplication<Application>()
-        InstallManager.start("Archivo del teléfono", null, retry = { installFromUri(uri) }) {
-            InstallSpec(listOf(InstallItem("Archivo") { Downloader.copyFromUri(ctx, uri) }))
+        InstallManager.start(ctx.getString(R.string.tool_phone_file_title), null, retry = { installFromUri(uri) }) {
+            InstallSpec(listOf(InstallItem(ctx.getString(R.string.tool_file_item)) { Downloader.copyFromUri(ctx, uri) }))
         }
     }
 
@@ -425,12 +429,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     // ---------- Diagnóstico de red ----------
 
     fun runDiagnosis() {
-        _diagnosis.value = listOf("⏳ Probando conexión…")
+        _diagnosis.value = listOf(getApplication<Application>().getString(R.string.diag_testing))
         viewModelScope.launch(Dispatchers.IO) {
             _diagnosis.value = listOf(
-                Http.probe("Internet (google)", "https://www.google.com/generate_204", false),
+                Http.probe(getApplication<Application>().getString(R.string.diag_internet), "https://www.google.com/generate_204", false),
                 Http.probe(
-                    if (Backend.usesProxy) "Servidor de AddonHub" else "api.curseforge.com",
+                    if (Backend.usesProxy) getApplication<Application>().getString(R.string.diag_server) else "api.curseforge.com",
                     "${Backend.apiBase}/categories?gameId=78022",
                     true,
                 ),

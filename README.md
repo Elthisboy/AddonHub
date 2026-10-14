@@ -19,6 +19,7 @@ whose author allows distribution, credits the author, and respects the dependenc
 - **Parental controls:** age profiles, PIN, content filter, parent-approved list.
 - **Background downloads** with a foreground service, resumable with HTTP `Range`.
 - **No ads, no accounts, no analytics.**
+- **Languages:** follows the phone's language (English and Spanish); any other language falls back to English.
 
 ## Layout
 

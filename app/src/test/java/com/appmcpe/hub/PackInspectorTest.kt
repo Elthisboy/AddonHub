@@ -1,6 +1,7 @@
 package com.appmcpe.hub
 
 import com.appmcpe.hub.install.PackInspector
+import com.appmcpe.hub.text.UiText
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -50,9 +51,12 @@ class PackInspectorTest {
         val addon = tempFile(zip("bp/manifest.json" to m), ".mcpack")
         val notes = PackInspector.inspect(listOf(addon), listOf(1, 21, 50))
         assertEquals(3, notes.size)
-        assertTrue(notes.any { it.contains("1 pack") })
-        assertTrue(notes.any { it.contains("APIs Beta") })
-        assertTrue(notes.any { it.contains("1.21.90") && it.contains("1.21.50") })
+        // Los avisos son UiText: se verifican por identificador y argumentos, no por el idioma del teléfono.
+        val missing = notes.filterIsInstance<UiText.Res>().first { it.id == R.string.note_missing_packs }
+        assertEquals(listOf<Any>(1), missing.args)
+        assertTrue(notes.any { it is UiText.Res && it.id == R.string.note_beta_apis })
+        val newer = notes.filterIsInstance<UiText.Res>().first { it.id == R.string.note_newer_minecraft }
+        assertEquals(listOf<Any>("1.21.90", "1.21.50"), newer.args)
     }
 
     @Test

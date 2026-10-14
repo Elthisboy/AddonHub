@@ -17,6 +17,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.appmcpe.hub.MainActivity
+import com.appmcpe.hub.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -79,13 +80,13 @@ class DownloadService : Service() {
                 is Stage.ReadyToImport -> notify(
                     DONE_ID,
                     doneNotification(
-                        "¡Descarga lista! 🎉",
-                        "Toca para importar «${session.title}» en Minecraft",
+                        getString(R.string.notif_ready_title),
+                        getString(R.string.notif_ready_text, session.title),
                     ),
                 )
                 is Stage.Error -> notify(
                     DONE_ID,
-                    doneNotification("No se pudo descargar", stage.message),
+                    doneNotification(getString(R.string.notif_error_title), stage.text.asString(this)),
                 )
                 else -> {}
             }
@@ -99,10 +100,10 @@ class DownloadService : Service() {
         if (Build.VERSION.SDK_INT < 26) return
         val nm = getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
-            NotificationChannel(CH_PROGRESS, "Descargas en curso", NotificationManager.IMPORTANCE_LOW),
+            NotificationChannel(CH_PROGRESS, getString(R.string.channel_progress), NotificationManager.IMPORTANCE_LOW),
         )
         nm.createNotificationChannel(
-            NotificationChannel(CH_DONE, "Descargas listas", NotificationManager.IMPORTANCE_DEFAULT),
+            NotificationChannel(CH_DONE, getString(R.string.channel_done), NotificationManager.IMPORTANCE_DEFAULT),
         )
     }
 
@@ -123,9 +124,9 @@ class DownloadService : Service() {
         when (stage) {
             is Stage.Downloading -> {
                 title = if (stage.count > 1) {
-                    "Descargando ${stage.index + 1} de ${stage.count}"
+                    getString(R.string.downloading_n_of_m, stage.index + 1, stage.count)
                 } else {
-                    "Descargando…"
+                    getString(R.string.downloading)
                 }
                 text = stage.name
                 if (stage.progress >= 0f) {
@@ -134,8 +135,8 @@ class DownloadService : Service() {
                     text = "${stage.name} · $percent%"
                 }
             }
-            is Stage.Opening -> title = "Abriendo Minecraft…"
-            else -> title = "Preparando descarga…"
+            is Stage.Opening -> title = getString(R.string.opening_minecraft)
+            else -> title = getString(R.string.notif_preparing)
         }
         val cancel = PendingIntent.getService(
             this,
@@ -151,7 +152,7 @@ class DownloadService : Service() {
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setContentIntent(openAppIntent())
-            .addAction(0, "Cancelar", cancel)
+            .addAction(0, getString(R.string.cancel), cancel)
             .build()
     }
 

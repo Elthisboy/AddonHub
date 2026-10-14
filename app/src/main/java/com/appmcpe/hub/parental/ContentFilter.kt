@@ -1,25 +1,27 @@
 package com.appmcpe.hub.parental
 
+import com.appmcpe.hub.R
 import com.appmcpe.hub.catalog.CfMod
 import com.appmcpe.hub.catalog.SearchRanker
+import com.appmcpe.hub.text.UiText
 
 /** Resultado de revisar un contenido. [reason] está pensado para mostrarse al niño. */
 data class Verdict(
     val blocked: Boolean,
-    val reason: String? = null,
+    val reason: UiText? = null,
     /** true = lo sexual/explícito: ni un PIN ni el modo adulto lo pueden permitir. */
     val permanent: Boolean = false,
 ) {
     companion object {
         val OK = Verdict(false)
-        fun blocked(reason: String, permanent: Boolean = false) = Verdict(true, reason, permanent)
+        fun blocked(reason: UiText, permanent: Boolean = false) = Verdict(true, reason, permanent)
     }
 }
 
 object ContentFilter {
-    private const val ADULT = "Contenido para adultos"
-    private const val NOT_FOR_AGE = "No es apto para tu edad"
-    private const val BLOCKED_BY_ADULT = "Un adulto bloqueó este tema"
+    private val ADULT = UiText.of(R.string.reason_adult)
+    private val NOT_FOR_AGE = UiText.of(R.string.reason_not_for_age)
+    private val BLOCKED_BY_ADULT = UiText.of(R.string.reason_blocked_by_adult)
 
     // En descripciones largas una palabra suelta no basta ("sin gore ni sangre"); se exige este número.
     private const val DESCRIPTION_THRESHOLD = 3

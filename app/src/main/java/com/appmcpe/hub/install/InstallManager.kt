@@ -3,6 +3,8 @@ package com.appmcpe.hub.install
 import android.app.Application
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.appmcpe.hub.text.UiText
+import com.appmcpe.hub.text.toUiText
 import com.appmcpe.hub.user.UserLists
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +42,7 @@ sealed interface Stage {
     /** Se envió [sentName] a Minecraft; falta importar [nextName] y los siguientes. */
     data class NextStep(val sent: Int, val count: Int, val sentName: String, val nextName: String) : Stage
     data class Done(val count: Int) : Stage
-    data class Error(val message: String) : Stage
+    data class Error(val text: UiText) : Stage
 }
 
 /** Verdadero mientras hay trabajo en curso (el servicio de descarga debe seguir vivo). */
@@ -55,7 +57,7 @@ data class InstallSession(
     /** Nombres de todo lo que se instalará, en orden. */
     val plan: List<String> = emptyList(),
     /** Avisos (dependencias que no se pueden bajar, APIs beta, versión de Minecraft…). */
-    val notes: List<String> = emptyList(),
+    val notes: List<UiText> = emptyList(),
     val retry: (() -> Unit)? = null,
 )
 
@@ -69,7 +71,7 @@ class InstallItem(
 
 private class PendingFile(val title: String, val file: File, val modId: Int?)
 
-class InstallSpec(val items: List<InstallItem>, val notes: List<String> = emptyList())
+class InstallSpec(val items: List<InstallItem>, val notes: List<UiText> = emptyList())
 
 /**
  * Dueño de la instalación en curso. Vive a nivel de aplicación (no de pantalla) para que la
@@ -131,7 +133,7 @@ object InstallManager {
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                setStage(Stage.Error(e.message ?: "Algo salió mal"))
+                setStage(Stage.Error(e.toUiText()))
             }
         }
     }
@@ -157,7 +159,7 @@ object InstallManager {
                     else Stage.NextStep(index, pending.size, name, pending[index + 1].title),
                 )
             },
-            onFailure = { setStage(Stage.Error(it.message ?: "No se pudo abrir Minecraft")) },
+            onFailure = { setStage(Stage.Error(it.toUiText())) },
         )
     }
 

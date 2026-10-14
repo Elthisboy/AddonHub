@@ -50,7 +50,10 @@ Sube el `.aab` a Play Console. El release usa R8 y no lleva la API key.
 - [ ] **Permiso de notificaciones y servicio en primer plano (`dataSync`):** declara su uso (descargas).
 - [ ] **Pruebas:** las cuentas personales nuevas pueden requerir una prueba cerrada con varios testers
       durante un tiempo antes de producción. Comprueba el requisito vigente.
-- [ ] Ficha: icono 512×512, imagen destacada, capturas de teléfono, descripción corta y larga.
+- [ ] Ficha en **dos idiomas**: inglés (predeterminado) y español. Usa `store/icon-512.png` y, de cada
+      idioma, `store/<en|es>/feature-graphic-1024x500.png` y las 4 capturas de `store/<en|es>/phone/`.
+      Redacta la descripción corta (80 caracteres) y la larga en ambos idiomas, con el aviso de
+      "app no oficial, no afiliada a Mojang ni Microsoft".
 
 ## 5. Después de publicar
 - [ ] Rate limiting en Cloudflare sobre el Worker.

@@ -25,6 +25,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.appmcpe.hub.R
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,20 +51,20 @@ fun ToolsScreen(vm: MainViewModel) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
-            if (mcInstalled) "✅ Minecraft encontrado" else "⚠️ Minecraft no está instalado",
+            if (mcInstalled) stringResource(R.string.tools_mc_found) else stringResource(R.string.tools_mc_missing),
             fontSize = 18.sp,
         )
 
-        BigButton("🎁 Instalar pack de prueba", Green) { vm.installTestPack() }
+        BigButton(stringResource(R.string.tools_test_pack), Green) { vm.installTestPack() }
 
         OutlinedTextField(
             value = url,
             onValueChange = { url = it },
-            label = { Text("Enlace de descarga (.mcpack, .mcaddon, .mcworld)") },
+            label = { Text(stringResource(R.string.tools_link_label)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
         )
-        BigButton("⬇️ Descargar e instalar", DarkGreen, enabled = url.isNotBlank()) {
+        BigButton(stringResource(R.string.tools_download_install), DarkGreen, enabled = url.isNotBlank()) {
             vm.installFromUrl(url)
         }
 
@@ -70,13 +72,13 @@ fun ToolsScreen(vm: MainViewModel) {
             onClick = { picker.launch(arrayOf("*/*")) },
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp),
-        ) { Text("📂 Elegir archivo del teléfono", fontSize = 18.sp) }
+        ) { Text(stringResource(R.string.tools_pick_file), fontSize = 18.sp) }
 
         OutlinedButton(
             onClick = vm::runDiagnosis,
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(16.dp),
-        ) { Text("📡 Probar conexión", fontSize = 18.sp) }
+        ) { Text(stringResource(R.string.tools_test_connection), fontSize = 18.sp) }
         diagnosis?.forEach { Text(it, fontSize = 14.sp) }
     }
 }

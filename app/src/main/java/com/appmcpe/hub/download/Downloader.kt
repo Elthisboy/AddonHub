@@ -3,8 +3,11 @@ package com.appmcpe.hub.download
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import com.appmcpe.hub.R
 import com.appmcpe.hub.install.ALLOWED_EXTENSIONS
 import com.appmcpe.hub.install.McInstaller
+import com.appmcpe.hub.text.UiIOException
+import com.appmcpe.hub.text.UiText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
@@ -24,7 +27,7 @@ object Downloader {
 
     /** El archivo no es de un tipo que Minecraft importe; reintentar no lo arregla. */
     private class UnsupportedFormat(ext: String) :
-        IOException("Formato no soportado (.$ext). Usa: ${ALLOWED_EXTENSIONS.joinToString()}")
+        UiIOException(UiText.of(R.string.error_unsupported_format, ext, ALLOWED_EXTENSIONS.joinToString()))
 
     private fun requireAllowed(name: String) {
         val ext = name.substringAfterLast('.', "").lowercase()
@@ -40,12 +43,12 @@ object Downloader {
     ): File = downloadTo(McInstaller.importsDir(context), url, fileName, onProgress = onProgress)
 
     /** Fallo HTTP; solo se reintenta si el error puede ser pasajero (servidor caído, demasiadas peticiones). */
-    private class HttpFailure(val code: Int) : IOException("Error del servidor: $code") {
+    private class HttpFailure(val code: Int) : UiIOException(UiText.of(R.string.error_server, code)) {
         val retryable: Boolean get() = code >= 500 || code == 408 || code == 429
     }
 
     /** El servidor no admite continuar una descarga (rechazó el Range): hay que empezar de cero. */
-    private class ResumeRejected : IOException("El servidor no admite continuar la descarga")
+    private class ResumeRejected : UiIOException(UiText.of(R.string.error_resume_rejected))
 
     private const val MAX_ATTEMPTS = 4
 
@@ -63,7 +66,7 @@ object Downloader {
         retryDelayMs: Long = 1_500,
         onProgress: (Long, Long) -> Unit,
     ): File = withContext(Dispatchers.IO) {
-        require(url.startsWith("https://") || url.startsWith("http://")) { "URL inválida" }
+        if (!(url.startsWith("https://") || url.startsWith("http://"))) throw UiIOException(UiText.of(R.string.error_invalid_url))
         dir.mkdirs()
         val fixedName = fileName?.let(::safeName)?.also(::requireAllowed)
         val knownPart = fixedName?.let { File(dir, "$it.part") }
@@ -118,7 +121,7 @@ object Downloader {
             val name = fixedName ?: safeName(response.request.url.encodedPath).also(::requireAllowed)
             val out = File(dir, name)
             val part = File(dir, "$name.part")
-            val body = response.body ?: throw IOException("Respuesta vacía")
+            val body = response.body ?: throw UiIOException(UiText.of(R.string.error_empty_response))
 
             // 206 = el servidor sigue desde donde pedimos; 200 = ignoró el Range y manda todo otra vez.
             val resuming = resumeFrom > 0 && response.code == 206
@@ -148,10 +151,10 @@ object Downloader {
                     }
                 }
                 // Si el servidor cortó antes de tiempo, el siguiente intento continúa desde aquí.
-                if (total > 0 && done != total) throw IOException("Descarga incompleta ($done de $total bytes)")
+                if (total > 0 && done != total) throw UiIOException(UiText.of(R.string.error_incomplete, done, total))
                 onProgress(done, if (total > 0) total else done)
                 out.delete()
-                if (!part.renameTo(out)) throw IOException("No se pudo guardar el archivo")
+                if (!part.renameTo(out)) throw UiIOException(UiText.of(R.string.error_save_file))
                 finished = true
                 out
             } finally {
@@ -172,7 +175,7 @@ object Downloader {
         val out = File(McInstaller.importsDir(context), name)
         context.contentResolver.openInputStream(uri)?.use { input ->
             out.outputStream().use { input.copyTo(it) }
-        } ?: throw IOException("No se pudo abrir el archivo")
+        } ?: throw UiIOException(UiText.of(R.string.error_open_file))
         out
     }
 

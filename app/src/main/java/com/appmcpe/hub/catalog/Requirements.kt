@@ -1,5 +1,8 @@
 package com.appmcpe.hub.catalog
 
+import com.appmcpe.hub.R
+import com.appmcpe.hub.text.UiText
+
 /**
  * Busca en la descripción lo que el autor pide y CurseForge no declara como dependencia:
  * experimentos que hay que activar y frases tipo «necesitas descargar X primero».
@@ -24,13 +27,16 @@ object Requirements {
     private const val MAX_LINES = 4
     private const val MAX_LINE_CHARS = 180
 
-    /** @return avisos listos para mostrar, sin repetir; vacío si la descripción no pide nada. */
-    fun extract(description: String): List<String> {
-        val out = LinkedHashSet<String>()
+    /**
+     * @return avisos listos para mostrar, sin repetir; vacío si la descripción no pide nada.
+     * El aviso de experimentos es traducible; las frases del autor se muestran tal cual las escribió.
+     */
+    fun extract(description: String): List<UiText> {
+        val out = LinkedHashSet<UiText>()
 
         val experiments = EXPERIMENTS.filter { (re, _) -> re.containsMatchIn(description) }.map { it.second }
         if (experiments.isNotEmpty()) {
-            out += "Activa en Experimentos del mundo: ${experiments.joinToString(", ")}."
+            out += UiText.of(R.string.req_experiments, experiments.joinToString(", "))
         }
 
         val lines = description.lines().map { it.trim() }
@@ -40,7 +46,7 @@ object Requirements {
             // Muchas descripciones cortan la frase: «…you need to download» / «Farmer's Delight».
             val next = lines.getOrNull(i + 1).orEmpty()
             val text = if (!line.endsWith('.') && next.isNotEmpty() && next.length <= 70) "$line $next" else line
-            out += text.take(MAX_LINE_CHARS).let { if (text.length > MAX_LINE_CHARS) "$it…" else it }
+            out += UiText.plain(text.take(MAX_LINE_CHARS).let { if (text.length > MAX_LINE_CHARS) "$it…" else it })
         }
         return out.toList()
     }

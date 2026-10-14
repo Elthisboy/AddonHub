@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Español (se usa cuando el teléfono está en cualquier variante del español). -->
+<resources>
+    <!-- Genérico -->
+    <string name="cancel">Cancelar</string>
+    <string name="back">Volver</string>
+    <string name="close">Cerrar</string>
+    <string name="retry">Reintentar</string>
+    <string name="save">Guardar</string>
+    <string name="add">Agregar</string>
+    <string name="remove">Quitar</string>
+    <string name="activate">Activar</string>
+    <string name="error_with_icon">❌ %1$s</string>
+
+    <!-- Pestañas -->
+    <string name="tab_explore">Explorar</string>
+    <string name="tab_favorites">Favoritos</string>
+    <string name="tab_downloads">Descargas</string>
+    <string name="tab_tools">Herramientas</string>
+
+    <!-- Categorías, orden y búsqueda -->
+    <string name="cat_addons">Addons</string>
+    <string name="cat_maps">Mapas</string>
+    <string name="cat_textures">Texturas</string>
+    <string name="cat_skins">Skins</string>
+    <string name="sort_popular">🔥 Popular</string>
+    <string name="sort_downloads">⬇️ Más bajados</string>
+    <string name="sort_newest">🆕 Nuevos</string>
+    <string name="sort_updated">🔄 Actualizados</string>
+    <string name="tier_content">📦 Contenido</string>
+    <string name="tier_creator">👤 Creador</string>
+    <string name="tier_keyword">🔎 Palabras clave</string>
+    <string name="search_placeholder">Buscar contenido, creador o palabra…</string>
+    <string name="search_all">🌐 Buscar en todo</string>
+    <string name="search_only_in">Solo en %1$s</string>
+    <string name="sub_all">Todo</string>
+    <string name="limited_notice">Mostrando solo lo más popular (la búsqueda completa no está disponible).</string>
+    <string name="blocked_search">Esa búsqueda no está disponible 🔒\nPrueba con otra palabra.</string>
+    <string name="no_results_for">No encontramos «%1$s» 😕\nPrueba con otra palabra.</string>
+    <string name="no_results">No encontramos nada 😕</string>
+    <string name="load_more">Ver más</string>
+
+    <!-- Subcategorías -->
+    <string name="sub_survival">Supervivencia</string>
+    <string name="sub_horror">Terror</string>
+    <string name="sub_magic">Magia</string>
+    <string name="sub_adventure">Aventura</string>
+    <string name="sub_puzzle">Rompecabezas</string>
+    <string name="sub_pvp">PvP</string>
+    <string name="sub_mobs">Mobs</string>
+    <string name="sub_players">Jugadores</string>
+    <string name="sub_fantasy">Fantasía</string>
+    <string name="sub_technology">Tecnología</string>
+    <string name="sub_utility">Utilidad</string>
+    <string name="sub_roleplay">Rol</string>
+    <string name="sub_multiplayer">Multijugador</string>
+    <string name="sub_food">Comida</string>
+    <string name="sub_realistic">Realista</string>
+    <string name="sub_simplistic">Simple</string>
+    <string name="sub_themed">Temático</string>
+    <string name="sub_minigame">Minijuegos</string>
+    <string name="sub_creation">Creación</string>
+    <string name="sub_miscellaneous">Varios</string>
+    <string name="sub_cosmetics">Cosméticos</string>
+    <string name="sub_performance">Rendimiento</string>
+    <string name="sub_vanilla">Vanilla+</string>
+    <string name="sub_custom_terrain">Terreno</string>
+    <string name="sub_armor_tools">Armas y herramientas</string>
+    <string name="sub_rollercoaster">Montañas rusas</string>
+    <string name="sub_enhanced_visuals">Visuales</string>
+    <string name="sub_gui">Interfaz</string>
+    <string name="sub_skin_packs">Skin packs</string>
+
+    <!-- Tipos de contenido -->
+    <string name="type_addon">Addon</string>
+    <string name="type_pack">Pack</string>
+    <string name="type_world">Mundo</string>
+    <string name="type_template">Plantilla</string>
+    <string name="type_file">Archivo</string>
+
+    <!-- Tarjetas -->
+    <string name="by_author">por %1$s</string>
+    <string name="needs_others">🔗 Necesita otros contenidos</string>
+    <string name="btn_view">👀 VER</string>
+    <string name="btn_install">⬇️ INSTALAR</string>
+    <string name="btn_install_all">⬇️ INSTALAR TODO (%1$d)</string>
+    <string name="fav_add">Añadir a favoritos</string>
+    <string name="fav_remove">Quitar de favoritos</string>
+
+    <!-- Detalle -->
+    <string name="detail_open_curseforge">🔒 Ver en CurseForge (solo adultos)</string>
+    <string name="image_of">Imagen de %1$s</string>
+    <string name="sec_download">📥 Lo que se va a descargar</string>
+    <string name="extra_needed">+ %1$d más que necesita</string>
+    <string name="install_note">Al terminar, se abrirá Minecraft para importarlo automáticamente.</string>
+    <string name="sec_others">🔗 Otros contenidos</string>
+    <string name="no_deps">El autor no declara que necesite otros contenidos. Al instalar también revisamos el interior del archivo.</string>
+    <string name="checking_deps">Revisando qué más necesita…</string>
+    <string name="deps_error">No pudimos revisar sus dependencias. Se intentará de nuevo al instalar.</string>
+    <string name="dep_required">Necesario (se instala solo)</string>
+    <string name="dep_unavailable">⚠️ No se puede descargar desde aquí</string>
+    <string name="dep_unavailable_item">• %1$s — búscalo en CurseForge</string>
+    <string name="dep_optional">Opcional (tú eliges)</string>
+    <string name="dep_incompatible">🚫 No lo mezcles con</string>
+    <string name="sec_author_asks">⚙️ Lo que pide el autor</string>
+    <string name="sec_summary">📝 Resumen</string>
+    <string name="sec_description">📖 Descripción</string>
+    <string name="no_description">No hay descripción disponible.</string>
+    <string name="read_more">Leer más ▼</string>
+    <string name="read_less">Ver menos ▲</string>
+    <string name="btn_ask_permission">🔒 %1$s · Pedir permiso</string>
+    <string name="req_experiments">Activa en Experimentos del mundo: %1$s.</string>
+
+    <!-- Pantalla de descarga -->
+    <string name="plan_summary">Se instalarán %1$d cosas: %2$s</string>
+    <string name="checking_needs">Revisando qué necesita…</string>
+    <string name="downloading">Descargando…</string>
+    <string name="downloading_n_of_m">Descargando %1$d de %2$d</string>
+    <string name="size_of">%1$s de %2$s</string>
+    <string name="hint_background">Puedes salir de la app: seguirá descargando y te avisamos cuando termine 🙂</string>
+    <string name="btn_background">Seguir en segundo plano</string>
+    <string name="btn_cancel_download">Cancelar descarga</string>
+    <string name="downloaded_title">✅ ¡Descargado!</string>
+    <string name="ready_multi">Ya están los %1$d archivos. Toca para importarlos a Minecraft.</string>
+    <string name="ready_single">Ya está listo. Toca para importarlo a Minecraft.</string>
+    <string name="btn_import">📥 IMPORTAR A MINECRAFT</string>
+    <string name="not_now">Ahora no</string>
+    <string name="opening_minecraft">Abriendo Minecraft…</string>
+    <string name="step_n_of_m">Paso %1$d de %2$d ✅</string>
+    <string name="next_step_text">Minecraft está importando «%1$s». Espera a que termine y vuelve aquí para seguir con «%2$s».</string>
+    <string name="btn_import_next">Importar siguiente (%1$d de %2$d)</string>
+    <string name="finish_here">Terminar aquí</string>
+    <string name="done_title">¡Listo!</string>
+    <string name="done_multi">Minecraft está importando el último archivo. Cuando termine, ya tendrás todo para usarlo.</string>
+    <string name="done_single">Minecraft está importando el archivo. Cuando termine, búscalo en tus mundos o en tus packs de recursos.</string>
+    <string name="notes_title">⚠️ Ojo</string>
+
+    <!-- Notificaciones -->
+    <string name="channel_progress">Descargas en curso</string>
+    <string name="channel_done">Descargas listas</string>
+    <string name="notif_preparing">Preparando descarga…</string>
+    <string name="notif_ready_title">¡Descarga lista! 🎉</string>
+    <string name="notif_ready_text">Toca para importar «%1$s» en Minecraft</string>
+    <string name="notif_error_title">No se pudo descargar</string>
+
+    <!-- Avisos del inspector de packs -->
+    <string name="note_missing_packs">Necesita %1$d pack(s) más que no vienen incluidos. Si ya los tienes en Minecraft no pasa nada; si no, revisa la descripción para ver cuáles instalar.</string>
+    <string name="note_beta_apis">Usa funciones beta: al crear o editar el mundo, activa «APIs Beta» (y los demás Experimentos si lo pide la descripción).</string>
+    <string name="note_newer_minecraft">Necesita Minecraft %1$s o más nuevo (tienes %2$s). Actualiza Minecraft en Google Play.</string>
+    <string name="note_dependency_unavailable">Necesita «%1$s», que no se puede descargar desde aquí. Búscalo en CurseForge.</string>
+
+    <!-- Errores -->
+    <string name="error_generic">Algo salió mal (%1$s)</string>
+    <string name="error_curseforge_status">CurseForge respondió %1$d</string>
+    <string name="error_empty_response">Respuesta vacía</string>
+    <string name="error_no_connection">Sin conexión con CurseForge (%1$s: %2$s). Prueba Herramientas → Probar conexión.</string>
+    <string name="error_not_configured">Falta configurar el servidor o la API key de CurseForge</string>
+    <string name="error_search_failed">No se pudo buscar: %1$s</string>
+    <string name="error_server">Error del servidor: %1$d</string>
+    <string name="error_unsupported_format">Formato no soportado (.%1$s). Usa: %2$s</string>
+    <string name="error_resume_rejected">El servidor no admite continuar la descarga</string>
+    <string name="error_invalid_url">Enlace inválido</string>
+    <string name="error_incomplete">Descarga incompleta (%1$d de %2$d bytes)</string>
+    <string name="error_save_file">No se pudo guardar el archivo</string>
+    <string name="error_open_file">No se pudo abrir el archivo</string>
+    <string name="error_minecraft_missing">Minecraft no está instalado</string>
+    <string name="error_minecraft_open">No se pudo abrir Minecraft</string>
+    <string name="blocked_not_allowed">🔒 Este contenido no está permitido para ti.</string>
+    <string name="blocked_needs_adult">🔒 Este contenido necesita permiso de un adulto. Ábrelo con «VER» y pídelo ahí.</string>
+
+    <!-- Pestañas de biblioteca -->
+    <string name="fav_empty_title">Aún no tienes favoritos</string>
+    <string name="fav_empty_text">Toca el 🤍 de cualquier contenido para guardarlo aquí.</string>
+    <string name="hist_empty_title">Todavía no has instalado nada</string>
+    <string name="hist_empty_text">Lo que instales aparecerá aquí por si quieres volver a ponerlo.</string>
+    <string name="hist_clear">🗑️ Borrar historial</string>
+    <string name="installed_on">Instalado el %1$s</string>
+    <string name="lib_hidden">%1$d guardado(s) no se muestran: ya no están disponibles o el filtro de edad los oculta.</string>
+
+    <!-- Herramientas -->
+    <string name="tools_mc_found">✅ Minecraft encontrado</string>
+    <string name="tools_mc_missing">⚠️ Minecraft no está instalado</string>
+    <string name="tools_test_pack">🎁 Instalar pack de prueba</string>
+    <string name="tools_link_label">Enlace de descarga (.mcpack, .mcaddon, .mcworld)</string>
+    <string name="tools_download_install">⬇️ Descargar e instalar</string>
+    <string name="tools_pick_file">📂 Elegir archivo del teléfono</string>
+    <string name="tools_test_connection">📡 Probar conexión</string>
+    <string name="tool_test_pack_title">Pack de prueba</string>
+    <string name="tool_link_title">Descarga por enlace</string>
+    <string name="tool_phone_file_title">Archivo del teléfono</string>
+    <string name="tool_file_item">Archivo</string>
+    <string name="diag_testing">⏳ Probando conexión…</string>
+    <string name="diag_internet">Internet (google)</string>
+    <string name="diag_server">Servidor de AddonHub</string>
+
+    <!-- Control de padres -->
+    <string name="parents_zone">Zona de padres</string>
+    <string name="pin_enter">Escribe tu PIN de 4 números.</string>
+    <string name="pin_wrong">PIN incorrecto. Te quedan %1$d intentos.</string>
+    <string name="pin_locked">Demasiados intentos. Espera %1$d s.</string>
+    <string name="ask_permission_title">Pedir permiso</string>
+    <string name="ask_permission_text">Un adulto debe escribir el PIN para permitir «%1$s».</string>
+    <string name="open_cf_title">Ver en CurseForge</string>
+    <string name="open_cf_text">Un adulto debe escribir el PIN para abrir la página de «%1$s» en el navegador.</string>
+    <string name="adult_mode_active">Modo adulto activo. Toca para salir</string>
+    <string name="onboarding_hello">¡Hola!</string>
+    <string name="onboarding_intro">Esta configuración es para una mamá, un papá o un adulto. Elige la edad de quien usará la app y crea un PIN de 4 números para la zona de padres.</string>
+    <string name="pin_create">Crea un PIN de 4 números</string>
+    <string name="pin_repeat">Repite el PIN</string>
+    <string name="pin_mismatch">Los PIN no coinciden.</string>
+    <string name="pin_note">Anota tu PIN. Si lo olvidas, la única forma de recuperarlo es borrar los datos de la app.</string>
+    <string name="btn_save_start">Guardar y empezar</string>
+    <string name="zone_title">👪 Padres</string>
+    <string name="sec_age">Edad de quien usa la app</string>
+    <string name="sec_words">Bloquear más palabras</string>
+    <string name="words_hint">Todo lo que mencione estas palabras se oculta y no se puede buscar.</string>
+    <string name="words_placeholder">Ej: zombie</string>
+    <string name="sec_allowed">Permitidos por un adulto</string>
+    <string name="allowed_empty">Aquí aparecen los contenidos que aprobaste a mano aunque el filtro los bloquee.</string>
+    <string name="sec_advanced">Avanzado</string>
+    <string name="tools_toggle_title">Mostrar «Herramientas»</string>
+    <string name="tools_toggle_desc">Permite instalar archivos y enlaces propios. Estos NO pasan por el filtro.</string>
+    <string name="change_pin">🔑 Cambiar PIN</string>
+    <string name="zone_footer">Siempre bloqueado, a cualquier edad: contenido sexual. Drogas, alcohol y apuestas solo se ven en modo adulto. El filtro revisa nombres, resúmenes y descripciones, pero no es perfecto: si algo no debería estar, avísanos.</string>
+    <string name="new_pin_title">Nuevo PIN</string>
+    <string name="new_pin">Nuevo PIN</string>
+    <string name="repeat_it">Repítelo</string>
+    <string name="adult_title">Modo adulto</string>
+    <string name="adult_locked">Demasiados intentos. Cierra y vuelve a abrir la app.</string>
+    <string name="adult_verified_text">Se quitará el filtro de edad hasta que salgas de la app. El contenido sexual sigue bloqueado.</string>
+    <string name="adult_birth_text">Escribe tu fecha de nacimiento. Solo se usa para comprobar que tienes 18 o más; no se guarda.</string>
+    <string name="day">Día</string>
+    <string name="month">Mes</string>
+    <string name="year">Año</string>
+    <string name="adult_confirm">Soy mayor de 18 y ningún menor usará este modo.</string>
+    <string name="adult_minor">Este modo es solo para mayores de 18 años.</string>
+    <string name="adult_invalid_date">Esa fecha no es válida.</string>
+
+    <!-- Perfiles de edad y razones del filtro -->
+    <string name="age_kids">6 a 9 años</string>
+    <string name="age_kids_desc">Sin terror, sangre, armas ni violencia.</string>
+    <string name="age_pre">10 a 12 años</string>
+    <string name="age_pre_desc">Sin terror, sangre, drogas ni alcohol. Permite armas y aventuras.</string>
+    <string name="age_teen">13 a 15 años</string>
+    <string name="age_teen_desc">Permite terror y acción. Sin drogas, alcohol ni apuestas.</string>
+    <string name="age_adult">Adulto (18+)</string>
+    <string name="age_adult_desc">Sin filtro de edad. Lo sexual sigue bloqueado.</string>
+    <string name="reason_adult">Contenido para adultos</string>
+    <string name="reason_not_for_age">No es apto para tu edad</string>
+    <string name="reason_blocked_by_adult">Un adulto bloqueó este tema</string>
+</resources>

@@ -7,6 +7,7 @@ import com.appmcpe.hub.catalog.Relation
 import com.appmcpe.hub.catalog.Requirements
 import com.appmcpe.hub.catalog.SearchRanker
 import com.appmcpe.hub.catalog.SearchRanker.Tier
+import com.appmcpe.hub.text.UiText
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -63,8 +64,8 @@ class SearchAndRequirementsTest {
             To create a port on Bedrock, I needed permission. Enable Holiday Creator Features in the world.
         """.trimIndent()
         val found = Requirements.extract(text)
-        assertTrue(found.any { it.contains("Holiday Creator Features") })
-        assertTrue(found.any { it.contains("you need to download Farmer's Delight") })
+        assertTrue(found.any { it == UiText.of(R.string.req_experiments, "Holiday Creator Features") })
+        assertTrue(found.any { it is UiText.Plain && it.value.contains("you need to download Farmer's Delight") })
     }
 
     @Test

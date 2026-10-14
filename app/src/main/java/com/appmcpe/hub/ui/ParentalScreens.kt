@@ -43,12 +43,15 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.appmcpe.hub.R
+import com.appmcpe.hub.text.UiText
 import com.appmcpe.hub.parental.AgeCheck
 import com.appmcpe.hub.parental.AgeGroup
 import com.appmcpe.hub.parental.ParentalStore
@@ -58,10 +61,10 @@ import com.appmcpe.hub.parental.PinResult
 private val Red = Color(0xFFC62828)
 
 /** Convierte el resultado de verificar el PIN en un mensaje de error (null = correcto). */
-fun pinErrorMessage(result: PinResult): String? = when (result) {
+fun pinErrorMessage(result: PinResult): UiText? = when (result) {
     PinResult.Ok -> null
-    is PinResult.Wrong -> "PIN incorrecto. Te quedan ${result.remainingTries} intentos."
-    is PinResult.Locked -> "Demasiados intentos. Espera ${result.seconds} s."
+    is PinResult.Wrong -> UiText.of(R.string.pin_wrong, result.remainingTries)
+    is PinResult.Locked -> UiText.of(R.string.pin_locked, result.seconds)
 }
 
 /** Pide el PIN de 4 números. [onSubmit] devuelve un mensaje de error, o null si fue correcto. */
@@ -70,10 +73,10 @@ fun PinDialog(
     title: String,
     subtitle: String? = null,
     onDismiss: () -> Unit,
-    onSubmit: (String) -> String?,
+    onSubmit: (String) -> UiText?,
 ) {
     var pin by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<UiText?>(null) }
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { focus.requestFocus() }
 
@@ -105,11 +108,11 @@ fun PinDialog(
                     placeholder = { Text("····") },
                     modifier = Modifier.fillMaxWidth().focusRequester(focus),
                 )
-                error?.let { Text(it, color = Red, fontSize = 14.sp) }
+                error?.let { Text(it.asString(), color = Red, fontSize = 14.sp) }
             }
         },
         confirmButton = {},
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
@@ -136,27 +139,26 @@ fun OnboardingScreen(onDone: (AgeGroup, String) -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Mascot(size = 72.dp)
                 Spacer(Modifier.width(14.dp))
-                Text("¡Hola!", fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = DarkGreen)
+                Text(stringResource(R.string.onboarding_hello), fontSize = 28.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = DarkGreen)
             }
             Text(
-                "Esta configuración es para una mamá, un papá o un adulto. Elige la edad de quien " +
-                    "usará la app y crea un PIN de 4 números para la zona de padres.",
+                stringResource(R.string.onboarding_intro),
                 fontSize = 15.sp,
             )
 
             AgeGroup.selectable.forEach { g -> AgeCard(g, selected = g == group) { group = g } }
 
-            PinField("Crea un PIN de 4 números", pin) { pin = it }
-            PinField("Repite el PIN", pin2) { pin2 = it }
+            PinField(stringResource(R.string.pin_create), pin) { pin = it }
+            PinField(stringResource(R.string.pin_repeat), pin2) { pin2 = it }
             if (pin.length == 4 && pin2.length == 4 && pin != pin2) {
-                Text("Los PIN no coinciden.", color = Red, fontSize = 14.sp)
+                Text(stringResource(R.string.pin_mismatch), color = Red, fontSize = 14.sp)
             }
             Text(
-                "Anota tu PIN. Si lo olvidas, la única forma de recuperarlo es borrar los datos de la app.",
+                stringResource(R.string.pin_note),
                 fontSize = 13.sp,
                 color = Color(0xFF37474F),
             )
-            BigButton("Guardar y empezar", Green, enabled = valid) { onDone(group, pin) }
+            BigButton(stringResource(R.string.btn_save_start), Green, enabled = valid) { onDone(group, pin) }
         }
     }
 }
@@ -190,8 +192,8 @@ private fun AgeCard(group: AgeGroup, selected: Boolean, onClick: () -> Unit) {
         Text(group.emoji, fontSize = 32.sp)
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(group.label, fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont)
-            Text(group.description, fontSize = 13.sp, color = Color(0xFF37474F))
+            Text(stringResource(group.labelRes), fontSize = 13.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont)
+            Text(stringResource(group.descriptionRes), fontSize = 13.sp, color = Color(0xFF37474F))
         }
         if (selected) Text("✅", fontSize = 22.sp)
     }
@@ -221,7 +223,7 @@ fun ParentZoneScreen(onClose: () -> Unit) {
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "👪 Padres",
+                    stringResource(R.string.zone_title),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont,
                     color = DarkGreen,
@@ -230,10 +232,10 @@ fun ParentZoneScreen(onClose: () -> Unit) {
                 Button(
                     onClick = onClose,
                     colors = ButtonDefaults.buttonColors(containerColor = DarkGreen),
-                ) { Text("Cerrar") }
+                ) { Text(stringResource(R.string.close)) }
             }
 
-            ZoneSection("Edad de quien usa la app") {
+            ZoneSection(stringResource(R.string.sec_age)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     AgeGroup.selectable.forEach { g ->
                         AgeCard(g, selected = g == settings.ageGroup) { ParentalStore.setAgeGroup(g) }
@@ -241,17 +243,17 @@ fun ParentZoneScreen(onClose: () -> Unit) {
                 }
             }
 
-            ZoneSection("Bloquear más palabras") {
+            ZoneSection(stringResource(R.string.sec_words)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        "Todo lo que mencione estas palabras se oculta y no se puede buscar.",
+                        stringResource(R.string.words_hint),
                         fontSize = 13.sp,
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         OutlinedTextField(
                             value = newWord,
                             onValueChange = { newWord = it },
-                            placeholder = { Text("Ej: zombie") },
+                            placeholder = { Text(stringResource(R.string.words_placeholder)) },
                             singleLine = true,
                             modifier = Modifier.weight(1f),
                         )
@@ -259,34 +261,34 @@ fun ParentZoneScreen(onClose: () -> Unit) {
                         Button(
                             onClick = { ParentalStore.addWord(newWord); newWord = "" },
                             enabled = newWord.trim().length >= 2,
-                        ) { Text("Agregar") }
+                        ) { Text(stringResource(R.string.add)) }
                     }
                     settings.customWords.sorted().forEach { w ->
-                        ListRow(w, "Quitar") { ParentalStore.removeWord(w) }
+                        ListRow(w, stringResource(R.string.remove)) { ParentalStore.removeWord(w) }
                     }
                 }
             }
 
-            ZoneSection("Permitidos por un adulto") {
+            ZoneSection(stringResource(R.string.sec_allowed)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (settings.allowed.isEmpty()) {
                         Text(
-                            "Aquí aparecen los contenidos que aprobaste a mano aunque el filtro los bloquee.",
+                            stringResource(R.string.allowed_empty),
                             fontSize = 13.sp,
                         )
                     }
                     settings.allowed.forEach { (id, name) ->
-                        ListRow(name, "Quitar") { ParentalStore.disallow(id) }
+                        ListRow(name, stringResource(R.string.remove)) { ParentalStore.disallow(id) }
                     }
                 }
             }
 
-            ZoneSection("Avanzado") {
+            ZoneSection(stringResource(R.string.sec_advanced)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text("Mostrar «Herramientas»", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.tools_toggle_title), fontWeight = FontWeight.Bold)
                         Text(
-                            "Permite instalar archivos y enlaces propios. Estos NO pasan por el filtro.",
+                            stringResource(R.string.tools_toggle_desc),
                             fontSize = 13.sp,
                         )
                     }
@@ -298,13 +300,11 @@ fun ParentZoneScreen(onClose: () -> Unit) {
                 onClick = { changingPin = true },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(16.dp),
-            ) { Text("🔑 Cambiar PIN", fontSize = 16.sp) }
+            ) { Text(stringResource(R.string.change_pin), fontSize = 16.sp) }
 
             // Entrada escondida del modo adulto: tocar 5 veces este texto.
             Text(
-                "Siempre bloqueado, a cualquier edad: contenido sexual. Drogas, alcohol y apuestas " +
-                    "solo se ven en modo adulto. El filtro revisa nombres, resúmenes y descripciones, " +
-                    "pero no es perfecto: si algo no debería estar, avísanos.",
+                stringResource(R.string.zone_footer),
                 fontSize = 12.sp,
                 color = Color(0xFF37474F),
                 modifier = Modifier.clickable(
@@ -350,38 +350,37 @@ private fun AdultModeDialog(alreadyVerified: Boolean, onDismiss: () -> Unit, onA
     var month by remember { mutableStateOf("") }
     var year by remember { mutableStateOf("") }
     var confirmed by remember { mutableStateOf(false) }
-    var error by remember { mutableStateOf<String?>(null) }
+    var error by remember { mutableStateOf<UiText?>(null) }
     val locked = failedAgeTries >= MAX_AGE_TRIES
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Modo adulto", fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont) },
+        title = { Text(stringResource(R.string.adult_title), fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 when {
-                    locked -> Text("Demasiados intentos. Cierra y vuelve a abrir la app.")
+                    locked -> Text(stringResource(R.string.adult_locked))
                     alreadyVerified -> Text(
-                        "Se quitará el filtro de edad hasta que salgas de la app. " +
-                            "El contenido sexual sigue bloqueado.",
+                        stringResource(R.string.adult_verified_text),
                         fontSize = 14.sp,
                     )
                     else -> {
-                        Text("Escribe tu fecha de nacimiento. Solo se usa para comprobar que tienes 18 o más; no se guarda.", fontSize = 14.sp)
+                        Text(stringResource(R.string.adult_birth_text), fontSize = 14.sp)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            DateField("Día", day, 2, Modifier.weight(1f)) { day = it }
-                            DateField("Mes", month, 2, Modifier.weight(1f)) { month = it }
-                            DateField("Año", year, 4, Modifier.weight(1.4f)) { year = it }
+                            DateField(stringResource(R.string.day), day, 2, Modifier.weight(1f)) { day = it }
+                            DateField(stringResource(R.string.month), month, 2, Modifier.weight(1f)) { month = it }
+                            DateField(stringResource(R.string.year), year, 4, Modifier.weight(1.4f)) { year = it }
                         }
                         Row(
                             Modifier.clickable { confirmed = !confirmed },
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             androidx.compose.material3.Checkbox(checked = confirmed, onCheckedChange = { confirmed = it })
-                            Text("Soy mayor de 18 y ningún menor usará este modo.", fontSize = 13.sp)
+                            Text(stringResource(R.string.adult_confirm), fontSize = 13.sp)
                         }
                     }
                 }
-                error?.let { Text(it, color = Red, fontSize = 14.sp) }
+                error?.let { Text(it.asString(), color = Red, fontSize = 14.sp) }
             }
         },
         confirmButton = {
@@ -399,17 +398,17 @@ private fun AdultModeDialog(alreadyVerified: Boolean, onDismiss: () -> Unit, onA
                         }
                         AgeCheck.Result.Minor -> {
                             failedAgeTries++
-                            error = "Este modo es solo para mayores de 18 años."
+                            error = UiText.of(R.string.adult_minor)
                         }
                         AgeCheck.Result.InvalidDate -> {
                             failedAgeTries++
-                            error = "Esa fecha no es válida."
+                            error = UiText.of(R.string.adult_invalid_date)
                         }
                     }
                 },
-            ) { Text("Activar") }
+            ) { Text(stringResource(R.string.activate)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
@@ -432,20 +431,20 @@ private fun ChangePinDialog(onDismiss: () -> Unit) {
     val valid = PinHasher.isValidFormat(pin) && pin == pin2
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Nuevo PIN", fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont) },
+        title = { Text(stringResource(R.string.new_pin_title), fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                PinField("Nuevo PIN", pin) { pin = it }
-                PinField("Repítelo", pin2) { pin2 = it }
+                PinField(stringResource(R.string.new_pin), pin) { pin = it }
+                PinField(stringResource(R.string.repeat_it), pin2) { pin2 = it }
             }
         },
         confirmButton = {
             TextButton(
                 enabled = valid,
                 onClick = { ParentalStore.setPin(pin); onDismiss() },
-            ) { Text("Guardar") }
+            ) { Text(stringResource(R.string.save)) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancelar") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 

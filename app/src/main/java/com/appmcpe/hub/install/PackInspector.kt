@@ -1,5 +1,7 @@
 package com.appmcpe.hub.install
 
+import com.appmcpe.hub.R
+import com.appmcpe.hub.text.UiText
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -25,30 +27,27 @@ object PackInspector {
 
     /**
      * @param installedVersion versión de Minecraft instalada (p. ej. [1, 21, 50]) o null si no se conoce.
-     * @return avisos en español, sin repetir; vacío si no hay nada que advertir.
+     * @return avisos traducibles, sin repetir; vacío si no hay nada que advertir.
      */
-    fun inspect(files: List<File>, installedVersion: List<Int>?): List<String> {
+    fun inspect(files: List<File>, installedVersion: List<Int>?): List<UiText> {
         val manifests = files.flatMap { runCatching { readManifests(it) }.getOrDefault(emptyList()) }
         if (manifests.isEmpty()) return emptyList()
 
-        val notes = LinkedHashSet<String>()
+        val notes = LinkedHashSet<UiText>()
 
         val provided = manifests.mapNotNull { it.uuid }.toSet()
         val missing = manifests.flatMap { it.dependencyUuids }.filter { it !in provided }.toSet()
         if (missing.isNotEmpty()) {
-            notes += "Necesita ${missing.size} pack(s) más que no vienen incluidos. Si ya los tienes " +
-                "en Minecraft no pasa nada; si no, revisa la descripción para ver cuáles instalar."
+            notes += UiText.of(R.string.note_missing_packs, missing.size)
         }
 
         if (manifests.any { it.betaModules.isNotEmpty() }) {
-            notes += "Usa funciones beta: al crear o editar el mundo, activa «APIs Beta» " +
-                "(y los demás Experimentos si lo pide la descripción)."
+            notes += UiText.of(R.string.note_beta_apis)
         }
 
         val needed = manifests.mapNotNull { it.minEngine }.maxWithOrNull(::compareVersions)
         if (needed != null && installedVersion != null && compareVersions(needed, installedVersion) > 0) {
-            notes += "Necesita Minecraft ${needed.joinToString(".")} o más nuevo " +
-                "(tienes ${installedVersion.joinToString(".")}). Actualiza Minecraft en Google Play."
+            notes += UiText.of(R.string.note_newer_minecraft, needed.joinToString("."), installedVersion.joinToString("."))
         }
         return notes.toList()
     }

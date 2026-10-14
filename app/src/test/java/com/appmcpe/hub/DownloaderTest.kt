@@ -1,6 +1,8 @@
 package com.appmcpe.hub
 
 import com.appmcpe.hub.download.Downloader
+import com.appmcpe.hub.text.UiText
+import com.appmcpe.hub.text.UiTextProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -72,6 +74,9 @@ class DownloaderTest {
     private fun rangeStart(r: RecordedRequest): Int? =
         r.getHeader("Range")?.removePrefix("bytes=")?.substringBefore('-')?.toIntOrNull()
 
+    private fun isUnsupportedFormat(e: IOException): Boolean =
+        (e as? UiTextProvider)?.text.let { it is UiText.Res && it.id == R.string.error_unsupported_format }
+
     private fun download(path: String, name: String? = "archivo.mcaddon", progress: (Long, Long) -> Unit = { _, _ -> }) =
         runBlocking { Downloader.downloadTo(dir, base(path), name, retryDelayMs = 1, onProgress = progress) }
 
@@ -136,7 +141,7 @@ class DownloaderTest {
             download("/missing")
             fail("debía fallar")
         } catch (e: IOException) {
-            assertTrue(e.message!!.contains("404"))
+            assertEquals(UiText.of(R.string.error_server, 404), (e as UiTextProvider).text)
         }
         assertEquals(1, seen.size)
         assertTrue(dir.list()!!.isEmpty())
@@ -156,7 +161,7 @@ class DownloaderTest {
             download("/down")
             fail("debía fallar")
         } catch (e: IOException) {
-            assertTrue(e.message!!.contains("500"))
+            assertEquals(UiText.of(R.string.error_server, 500), (e as UiTextProvider).text)
         }
         assertEquals(4, seen.size)
         assertTrue(dir.list()!!.isEmpty())
@@ -169,7 +174,7 @@ class DownloaderTest {
             download("/x", name = "virus.exe")
             fail("debía fallar")
         } catch (e: IOException) {
-            assertTrue(e.message!!.startsWith("Formato no soportado"))
+            assertTrue(isUnsupportedFormat(e))
         }
         assertEquals(0, seen.size)
     }
@@ -182,7 +187,7 @@ class DownloaderTest {
             download("/files/malo.exe", name = null)
             fail("debía fallar")
         } catch (e: IOException) {
-            assertTrue(e.message!!.startsWith("Formato no soportado"))
+            assertTrue(isUnsupportedFormat(e))
         }
         assertEquals(listOf("mundo.mcworld"), dir.list()!!.toList())
     }

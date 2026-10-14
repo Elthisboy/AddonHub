@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.appmcpe.hub.install.InstallSession
 import com.appmcpe.hub.install.Stage
+import com.appmcpe.hub.R
 import com.appmcpe.hub.install.isWorking
 
 /**
@@ -108,7 +110,7 @@ fun DownloadScreen(
             )
             if (session.plan.size > 1) {
                 Text(
-                    "Se instalarán ${session.plan.size} cosas: " + session.plan.joinToString(" → "),
+                    stringResource(R.string.plan_summary, session.plan.size, session.plan.joinToString(" → ")),
                     fontSize = 13.sp,
                     color = Color(0xFF37474F),
                     textAlign = TextAlign.Center,
@@ -119,13 +121,13 @@ fun DownloadScreen(
             when (stage) {
                 Stage.Preparing -> {
                     CircularProgressIndicator(color = DarkGreen)
-                    Text("Revisando qué necesita…", fontSize = 15.sp, fontWeight = FontWeight.Bold, fontFamily = PixelFont, textAlign = TextAlign.Center)
-                    CancelButton("Cancelar", onClose)
+                    Text(stringResource(R.string.checking_needs), fontSize = 15.sp, fontWeight = FontWeight.Bold, fontFamily = PixelFont, textAlign = TextAlign.Center)
+                    CancelButton(stringResource(R.string.cancel), onClose)
                 }
                 is Stage.Downloading -> {
                     Text(
-                        if (stage.count > 1) "Descargando ${stage.index + 1} de ${stage.count}"
-                        else "Descargando…",
+                        if (stage.count > 1) stringResource(R.string.downloading_n_of_m, stage.index + 1, stage.count)
+                        else stringResource(R.string.downloading),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                     )
@@ -138,7 +140,7 @@ fun DownloadScreen(
                             trackColor = Color.White,
                         )
                         Text("${(stage.progress * 100).toInt()}%", fontSize = 40.sp, fontWeight = FontWeight.ExtraBold)
-                        Text("${formatSize(stage.done)} de ${formatSize(stage.total)}", fontSize = 16.sp)
+                        Text(stringResource(R.string.size_of, formatSize(stage.done), formatSize(stage.total)), fontSize = 16.sp)
                     } else {
                         LinearProgressIndicator(
                             modifier = Modifier.fillMaxWidth().height(16.dp).clip(RoundedCornerShape(8.dp)),
@@ -147,66 +149,59 @@ fun DownloadScreen(
                         )
                         if (stage.done > 0) Text(formatSize(stage.done), fontSize = 16.sp)
                     }
-                    Hint("Puedes salir de la app: seguirá descargando y te avisamos cuando termine 🙂")
-                    CancelButton("Seguir en segundo plano") { activity?.moveTaskToBack(true) }
-                    CancelButton("Cancelar descarga", onClose)
+                    Hint(stringResource(R.string.hint_background))
+                    CancelButton(stringResource(R.string.btn_background)) { activity?.moveTaskToBack(true) }
+                    CancelButton(stringResource(R.string.btn_cancel_download), onClose)
                 }
                 is Stage.ReadyToImport -> {
-                    Text("✅ ¡Descargado!", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = DarkGreen)
+                    Text(stringResource(R.string.downloaded_title), fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = DarkGreen)
                     Text(
-                        if (stage.count > 1) "Ya están los ${stage.count} archivos. Toca para importarlos a Minecraft."
-                        else "Ya está listo. Toca para importarlo a Minecraft.",
+                        if (stage.count > 1) stringResource(R.string.ready_multi, stage.count)
+                        else stringResource(R.string.ready_single),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                     )
-                    BigButton("📥 IMPORTAR A MINECRAFT", Green, onClick = onNext)
-                    CancelButton("Ahora no", onClose)
+                    BigButton(stringResource(R.string.btn_import), Green, onClick = onNext)
+                    CancelButton(stringResource(R.string.not_now), onClose)
                 }
                 is Stage.Opening -> {
                     CircularProgressIndicator(color = DarkGreen)
-                    Text("Abriendo Minecraft…", fontSize = 15.sp, fontWeight = FontWeight.Bold, fontFamily = PixelFont, textAlign = TextAlign.Center)
+                    Text(stringResource(R.string.opening_minecraft), fontSize = 15.sp, fontWeight = FontWeight.Bold, fontFamily = PixelFont, textAlign = TextAlign.Center)
                     Text(stage.name, fontSize = 15.sp, textAlign = TextAlign.Center)
                 }
                 is Stage.NextStep -> {
                     Text(
-                        "Paso ${stage.sent + 1} de ${stage.count} ✅",
+                        stringResource(R.string.step_n_of_m, stage.sent + 1, stage.count),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont,
                         color = DarkGreen,
                     )
                     Text(
-                        "Minecraft está importando «${stage.sentName}». Espera a que termine y " +
-                            "vuelve aquí para seguir con «${stage.nextName}».",
+                        stringResource(R.string.next_step_text, stage.sentName, stage.nextName),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                     )
-                    BigButton("Importar siguiente (${stage.sent + 2} de ${stage.count})", Green, onClick = onNext)
-                    CancelButton("Terminar aquí", onClose)
+                    BigButton(stringResource(R.string.btn_import_next, stage.sent + 2, stage.count), Green, onClick = onNext)
+                    CancelButton(stringResource(R.string.finish_here), onClose)
                 }
                 is Stage.Done -> {
-                    Text("¡Listo!", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = DarkGreen)
+                    Text(stringResource(R.string.done_title), fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = DarkGreen)
                     Text(
-                        if (stage.count > 1) {
-                            "Minecraft está importando el último archivo. Cuando termine, ya tendrás " +
-                                "todo para usarlo."
-                        } else {
-                            "Minecraft está importando el archivo. Cuando termine, búscalo en tus " +
-                                "mundos o en tus packs de recursos."
-                        },
+                        if (stage.count > 1) stringResource(R.string.done_multi) else stringResource(R.string.done_single),
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
                     )
-                    BigButton("Volver", Green, onClick = onClose)
+                    BigButton(stringResource(R.string.back), Green, onClick = onClose)
                 }
                 is Stage.Error -> {
                     Text(
-                        stage.message,
+                        stage.text.asString(),
                         fontSize = 16.sp,
                         color = Color(0xFFC62828),
                         textAlign = TextAlign.Center,
                     )
-                    BigButton("Reintentar", Green, onClick = onRetry)
-                    CancelButton("Volver", onClose)
+                    BigButton(stringResource(R.string.retry), Green, onClick = onRetry)
+                    CancelButton(stringResource(R.string.back), onClose)
                 }
             }
 
@@ -219,8 +214,8 @@ fun DownloadScreen(
                         .padding(14.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
-                    Text("⚠️ Ojo", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = Color(0xFF8D6E00))
-                    session.notes.forEach { Text("• $it", fontSize = 14.sp) }
+                    Text(stringResource(R.string.notes_title), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, fontFamily = PixelFont, color = Color(0xFF8D6E00))
+                    session.notes.forEach { Text("• ${it.asString()}", fontSize = 14.sp) }
                 }
             }
         }

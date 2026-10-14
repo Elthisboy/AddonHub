@@ -33,13 +33,19 @@ Leyenda: ✅ hecho y verificado · 🟡 hecho, falta probar en teléfono · ⬜ 
 - ✅ Tema propio verde (antes los botones salían morados)
 - ✅ Revisión visual en 320 dp, 360 dp y tableta con capturas automáticas (`UiScreenshotsTest`, salen en
   `app/build/screenshots/`); corrigió desbordes de la fuente pixelada y pestañas que no cabían
-- ⬜ Textos en inglés: los textos están dentro del código y de las capas de lógica (filtro, errores,
-  avisos); traducir exige moverlos a recursos (~250 textos). Decisión pendiente.
+- ✅ Idiomas: la app toma el idioma del teléfono (español o inglés) y, si no es ninguno de los dos, usa inglés.
+  Los ~220 textos viven en `strings.xml` (`values/` inglés, `values-es/` español); la lógica (errores, avisos,
+  filtro) devuelve `UiText`, que se traduce solo en la pantalla. Pruebas: mismas claves y argumentos en ambos
+  archivos, español aplicado, francés/japonés caen en inglés. Android 13+ también la muestra en
+  Ajustes → Idioma de la app.
+- ⬜ Más idiomas (portugués, francés…): basta añadir `values-xx/strings.xml` y la lista en `locales_config.xml`.
+  El filtro de contenido solo conoce palabras en inglés y español.
 - ✅ Ancho máximo de 640 dp en tabletas (columna centrada)
 - ✅ Accesibilidad: nombres para TalkBack en iconos y pestañas, zonas táctiles de 48 dp (4 pruebas)
 - ✅ Icono cambiado a la mascota Hubi: el bloque de césped anterior se parecía demasiado al de Minecraft
-- ✅ Material de Google Play generado en `store/` (icono 512, imagen destacada 1024×500, 4 capturas 1080×2160)
-  con contenido ficticio; se regenera con `gradlew testDebugUnitTest --tests "*Store*"`
+- ✅ Material de Google Play en `store/` (icono 512 común; imagen destacada 1024×500 y 4 capturas 1080×2160
+  en `store/es/` y `store/en/`) con contenido ficticio; se regenera con
+  `gradlew testDebugUnitTest --tests "*Store*"`
 - ⬜ Sonidos (necesitan archivos de audio con licencia)
 - ⬜ Probar en dispositivos reales con Android 8 a 15
 

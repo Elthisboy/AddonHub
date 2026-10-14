@@ -58,7 +58,7 @@ object ParentalStore {
     // ---------- PIN ----------
 
     fun setPin(pin: String) {
-        require(PinHasher.isValidFormat(pin)) { "El PIN debe tener 4 números" }
+        require(PinHasher.isValidFormat(pin)) { "The PIN must have exactly 4 digits" }
         val salt = PinHasher.newSalt()
         edit {
             putString(K_PIN_SALT, salt)

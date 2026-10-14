@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.appmcpe.hub.R
 import com.appmcpe.hub.catalog.CfMod
 import com.appmcpe.hub.catalog.ExternalLinks
 import com.appmcpe.hub.parental.ParentalStore
@@ -135,8 +137,8 @@ fun MainScreen(vm: MainViewModel = viewModel()) {
         // Zona de padres: primero el PIN, luego los ajustes.
         when (parentStep) {
             ParentStep.PIN -> PinDialog(
-                title = "Zona de padres",
-                subtitle = "Escribe tu PIN de 4 números.",
+                title = stringResource(R.string.parents_zone),
+                subtitle = stringResource(R.string.pin_enter),
                 onDismiss = { parentStep = ParentStep.NONE },
                 onSubmit = { pin ->
                     pinErrorMessage(ParentalStore.verifyPin(pin)).also { err ->
@@ -151,8 +153,8 @@ fun MainScreen(vm: MainViewModel = viewModel()) {
         // Un adulto aprueba un contenido bloqueado por el filtro de edad.
         askAdultFor?.let { mod ->
             PinDialog(
-                title = "Pedir permiso",
-                subtitle = "Un adulto debe escribir el PIN para permitir «${mod.name}».",
+                title = stringResource(R.string.ask_permission_title),
+                subtitle = stringResource(R.string.ask_permission_text, mod.name),
                 onDismiss = { askAdultFor = null },
                 onSubmit = { pin ->
                     pinErrorMessage(ParentalStore.verifyPin(pin)).also { err ->
@@ -168,8 +170,8 @@ fun MainScreen(vm: MainViewModel = viewModel()) {
         // Salir de la app hacia la página del autor en CurseForge: solo con el PIN de un adulto.
         openLinkFor?.let { mod ->
             PinDialog(
-                title = "Ver en CurseForge",
-                subtitle = "Un adulto debe escribir el PIN para abrir la página de «${mod.name}» en el navegador.",
+                title = stringResource(R.string.open_cf_title),
+                subtitle = stringResource(R.string.open_cf_text, mod.name),
                 onDismiss = { openLinkFor = null },
                 onSubmit = { pin ->
                     pinErrorMessage(ParentalStore.verifyPin(pin)).also { err ->
@@ -211,6 +213,8 @@ private fun openCurseForgePage(context: android.content.Context, url: String) {
 /** Título de la app, aviso de modo adulto (si está activo) y el engranaje de la zona de padres. */
 @Composable
 fun AppHeader(adultMode: Boolean, onAdultOff: () -> Unit, onParents: () -> Unit) {
+    val adultLabel = stringResource(R.string.adult_mode_active)
+    val parentsLabel = stringResource(R.string.parents_zone)
     Row(
         Modifier.fillMaxWidth().padding(start = 20.dp, end = 12.dp, top = 12.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -237,7 +241,7 @@ fun AppHeader(adultMode: Boolean, onAdultOff: () -> Unit, onParents: () -> Unit)
                     .padding(end = 8.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color(0xFFEF6C00))
-                    .semantics { contentDescription = "Modo adulto activo. Toca para salir"; role = Role.Button }
+                    .semantics { contentDescription = adultLabel; role = Role.Button }
                     .clickable(onClick = onAdultOff)
                     .padding(horizontal = 12.dp, vertical = 14.dp),
             )
@@ -247,7 +251,7 @@ fun AppHeader(adultMode: Boolean, onAdultOff: () -> Unit, onParents: () -> Unit)
                 .size(48.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .background(Color.White)
-                .semantics { contentDescription = "Zona de padres"; role = Role.Button }
+                .semantics { contentDescription = parentsLabel; role = Role.Button }
                 .clickable(onClick = onParents),
             contentAlignment = Alignment.Center,
         ) { Text("⚙️", fontSize = 22.sp) }
@@ -258,10 +262,10 @@ fun AppHeader(adultMode: Boolean, onAdultOff: () -> Unit, onParents: () -> Unit)
 @Composable
 fun TabBar(active: Int, toolsEnabled: Boolean, onSelect: (Int) -> Unit) {
     val tabs = buildList {
-        add("🔍" to "Explorar")
-        add("❤️" to "Favoritos")
-        add("📥" to "Descargas")
-        if (toolsEnabled) add("🛠️" to "Herramientas")
+        add("🔍" to stringResource(R.string.tab_explore))
+        add("❤️" to stringResource(R.string.tab_favorites))
+        add("📥" to stringResource(R.string.tab_downloads))
+        if (toolsEnabled) add("🛠️" to stringResource(R.string.tab_tools))
     }
     // En pantallas estrechas solo la pestaña activa muestra su nombre; las demás, solo el icono.
     BoxWithConstraints(Modifier.fillMaxWidth()) {
