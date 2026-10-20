@@ -4,10 +4,8 @@ title: Privacy policy
 
 # AddonHub privacy policy
 
-> **DRAFT.** Have someone with legal knowledge review it before publishing, and fill in the date.
-
-**Last updated:** [DATE]
-**Developer:** Cristopher Carneyro ("El_this_boy") · **Contact:** [open an issue](https://github.com/Elthisboy/AddonHub/issues) or [CONTACT EMAIL]
+**Last updated:** October 20, 2026
+**Developer:** Cristopher Carneyro ("El_this_boy") · **Contact:** [open an issue](https://github.com/Elthisboy/AddonHub/issues) or write to el.this.boy@gmail.com
 
 AddonHub is an **unofficial** app to download and install community content for Minecraft Bedrock Edition.
 It is not affiliated with, endorsed by, or associated with Mojang, Microsoft, or Overwolf / CurseForge.
@@ -63,6 +61,6 @@ resets the parental settings and the PIN).
 
 ## Changes and contact
 
-If this policy changes, the date above will be updated. Questions: [open an issue](https://github.com/Elthisboy/AddonHub/issues).
+If this policy changes, the date above will be updated. Questions: [open an issue](https://github.com/Elthisboy/AddonHub/issues) or write to el.this.boy@gmail.com.
 
 *Versión en español: [Política de privacidad](politica-de-privacidad).*

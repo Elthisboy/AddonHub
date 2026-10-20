@@ -4,11 +4,8 @@ title: Política de privacidad
 
 # Política de privacidad de AddonHub
 
-> **BORRADOR.** Rellena los campos entre [corchetes] y haz que la revise alguien con conocimientos legales
-> antes de publicarla. Debe alojarse en una dirección web pública (Google Play la pide).
-
-**Última actualización:** [FECHA]
-**Responsable:** [TU NOMBRE O EL DE TU PROYECTO] · **Contacto:** [TU CORREO]
+**Última actualización:** 20 de octubre de 2026
+**Responsable:** Cristopher Carneyro ("El_this_boy") · **Contacto:** el.this.boy@gmail.com
 
 AddonHub es una app **no oficial** para descargar e instalar contenido de la comunidad de Minecraft Bedrock.
 No está afiliada, asociada ni respaldada por Mojang, Microsoft ni Overwolf/CurseForge.
@@ -66,4 +63,4 @@ Almacenamiento → Borrar datos (esto también reinicia la configuración de pad
 
 ## Cambios y contacto
 
-Si esta política cambia, se actualizará la fecha de arriba. Dudas: [TU CORREO].
+Si esta política cambia, se actualizará la fecha de arriba. Dudas: el.this.boy@gmail.com.
