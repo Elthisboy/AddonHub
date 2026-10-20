@@ -243,8 +243,10 @@
     <string name="age_kids_desc">No horror, blood, weapons or violence.</string>
     <string name="age_pre">Ages 10 to 12</string>
     <string name="age_pre_desc">No horror, blood, drugs or alcohol. Allows weapons and adventures.</string>
-    <string name="age_teen">Ages 13 to 15</string>
+    <string name="age_teen">Ages 13 to 14</string>
     <string name="age_teen_desc">Allows horror and action. No drugs, alcohol or gambling.</string>
+    <string name="age_over15">15 and up</string>
+    <string name="age_over15_desc">Everything except sexual content, which is always blocked.</string>
     <string name="age_adult">Adult (18+)</string>
     <string name="age_adult_desc">No age filter. Sexual content stays blocked.</string>
     <string name="reason_adult">Adult content</string>

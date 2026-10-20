@@ -49,7 +49,7 @@ object ContentFilter {
 
     /** Marcas como "18+" o "adults only": bloquean a todos salvo en modo adulto. */
     private fun hasAdultMarker(raw: String, group: AgeGroup): Boolean {
-        if (group == AgeGroup.ADULT) return false
+        if (group.unfiltered) return false
         val lower = raw.lowercase()
         return ContentTerms.ADULT_ONLY_RAW.any { it.containsMatchIn(lower) }
     }
@@ -59,7 +59,7 @@ object ContentFilter {
         AgeGroup.KIDS -> mature + kidsOnly + adultOnly
         AgeGroup.PRE -> mature + adultOnly
         AgeGroup.TEEN -> adultOnly
-        AgeGroup.ADULT -> emptyList()
+        AgeGroup.OVER15, AgeGroup.ADULT -> emptyList()
     }
 
     /** ¿Está bloqueada una subcategoría entera (p. ej. Horror) para este perfil? */

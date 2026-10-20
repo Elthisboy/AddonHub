@@ -57,6 +57,19 @@ class ParentalTest {
     }
 
     @Test
+    fun over15AllowsEverythingExceptSexual_withoutAdultMode() {
+        val s = settings(AgeGroup.OVER15)
+        for (m in listOf(
+            mod("Beer Brewing", "Make cerveza"), mod("Scary Horror Mansion"), mod("Gun Pack"),
+            mod("Cool map 18+"), mod("Casino Royale", cats = listOf(8833)),
+        )) assertFalse(m.name, blocked(m, s))
+        assertFalse(ContentFilter.isQueryBlocked("vodka", s))
+        assertTrue(ContentFilter.check(mod("NSFW Skins"), s).permanent)
+        assertTrue(ContentFilter.isQueryBlocked("porn", s))
+        assertTrue(AgeGroup.OVER15 in AgeGroup.selectable)
+    }
+
+    @Test
     fun sexualContentIsNeverAllowed_notEvenInAdultMode_orByParentApproval() {
         val m = mod("NSFW Skins", id = 7)
         val adult = settings(AgeGroup.TEEN, adult = true)

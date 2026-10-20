@@ -9,8 +9,14 @@ enum class AgeGroup(@StringRes val labelRes: Int, val emoji: String, @StringRes 
     PRE(R.string.age_pre, "🧑", R.string.age_pre_desc),
     TEEN(R.string.age_teen, "😎", R.string.age_teen_desc),
 
+    /** +15 elegido por un adulto: sin filtro de edad, pero lo sexual sigue bloqueado como en todos. */
+    OVER15(R.string.age_over15, "🎮", R.string.age_over15_desc),
+
     /** Solo se activa desde el modo adulto escondido; no aparece en la lista de edades. */
     ADULT(R.string.age_adult, "🔓", R.string.age_adult_desc);
+
+    /** Sin filtro de edad ni marcas "18+": solo queda el bloqueo permanente de lo sexual. */
+    val unfiltered: Boolean get() = this == OVER15 || this == ADULT
 
     companion object {
         /** Las edades que un adulto puede elegir normalmente. */
