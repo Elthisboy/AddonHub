@@ -31,13 +31,13 @@ if (gradle.startParameter.taskNames.any { it.contains("release", ignoreCase = tr
 
 android {
     namespace = "com.appmcpe.hub"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.elthisboy.addonhub"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 13
+        targetSdk = 36
+        versionCode = 14
         versionName = "0.11.0"
         buildConfigField("String", "CF_API_KEY", "\"$devApiKey\"")
         buildConfigField("String", "CF_PROXY_URL", "\"$proxyUrl\"")
