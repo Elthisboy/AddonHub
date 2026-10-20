@@ -34,7 +34,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.appmcpe.hub"
+        applicationId = "com.elthisboy.addonhub"
         minSdk = 26
         targetSdk = 35
         versionCode = 13
