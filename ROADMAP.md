@@ -16,6 +16,7 @@ Leyenda: ✅ hecho y verificado · 🟡 hecho, falta probar en teléfono · ⬜ 
 ## Seguridad y legal
 - ✅ Modo padres: PIN, perfiles por edad, palabras bloqueadas, permitidos, herramientas ocultas
 - ✅ Filtro de contenido (tests + medición con datos reales)
+- ✅ Perfil "15 años o más": todo menos lo sexual, sin modo adulto
 - ✅ Modo adulto escondido (lo sexual siempre bloqueado; se apaga al salir de la app)
 - ✅ Backend (proxy) escrito y verificado: 27 pruebas con `node --test` + comprobación en vivo contra CurseForge
   (categorías, búsqueda, lote, descripción, descarga real de un .mcpack, `Range`)
@@ -51,7 +52,8 @@ Leyenda: ✅ hecho y verificado · 🟡 hecho, falta probar en teléfono · ⬜ 
 
 ## Publicación
 - ✅ Release con R8 que compila (1,5 MB) y se niega a compilar sin proxy
-- 🙋 Crear la llave de firma y `keystore.properties` (`docs/publicacion-play.md`)
-- 🙋 Cuenta de Play Console, ficha, Families, pruebas cerradas
+- ✅ Llave de subida `addonhub-upload.jks` + `keystore.properties` (fuera de git; 🙋 guarda una copia de respaldo)
+- ✅ App creada en Play Console (`com.elthisboy.addonhub`, target API 36) y 0.11.0 publicada en **prueba interna**
+- 🙋 Ficha de la tienda, contenido de la app (Families, seguridad de datos, clasificación) y prueba cerrada
 - 🟡 Reanudar descargas cortadas (hasta 4 intentos con `Range`; 11 pruebas con servidor local)
 - ⬜ Verificación de la app con Play Integrity (frena abusos del proxy)
