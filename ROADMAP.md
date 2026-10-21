@@ -56,7 +56,8 @@ Leyenda: ✅ hecho y verificado · 🟡 hecho, falta probar en teléfono · ⬜ 
 - ✅ App creada en Play Console (`com.elthisboy.addonhub`, target API 36) y 0.11.0 publicada en **prueba interna**
 - ✅ Política de privacidad pública (en/es) y declaraciones de Play: anuncios, acceso, clasificación IARC (resultó **12+**), público 13–17 (sin Families), seguridad de datos (sin recopilación), ID de publicidad, gubernamental, financiera, salud
 - ✅ Ficha de la tienda en inglés y español (textos, icono, gráfico y capturas), categoría Herramientas y contacto
-- 🙋 Declaración de **servicio en primer plano** (`dataSync`): Play exige un enlace a un video (YouTube, público o no listado) que muestre una descarga con la notificación y la app en segundo plano
-- 🙋 Enviar a revisión desde "Descripción general de la publicación" y pasar a prueba cerrada (≈12 verificadores, 14 días, si la cuenta es personal nueva)
+- ✅ Declaración de servicio en primer plano con video y versión 0.11.0 (código 14) en prueba cerrada "Alpha" (177 países)
+- ✅ 16 cambios enviados a revisión de Google (20 oct 2026); la revisión tarda de horas a unos días
+- 🙋 Lista propia de **12 verificadores** para AddonHub (ahora usa "Testers Magic Sort", 7 personas) y 14 días de prueba cerrada antes de pedir producción
 - 🟡 Reanudar descargas cortadas (hasta 4 intentos con `Range`; 11 pruebas con servidor local)
 - ⬜ Verificación de la app con Play Integrity (frena abusos del proxy)
