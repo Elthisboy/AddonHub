@@ -54,6 +54,9 @@ Leyenda: ✅ hecho y verificado · 🟡 hecho, falta probar en teléfono · ⬜ 
 - ✅ Release con R8 que compila (1,5 MB) y se niega a compilar sin proxy
 - ✅ Llave de subida `addonhub-upload.jks` + `keystore.properties` (fuera de git; 🙋 guarda una copia de respaldo)
 - ✅ App creada en Play Console (`com.elthisboy.addonhub`, target API 36) y 0.11.0 publicada en **prueba interna**
-- 🙋 Ficha de la tienda, contenido de la app (Families, seguridad de datos, clasificación) y prueba cerrada
+- ✅ Política de privacidad pública (en/es) y declaraciones de Play: anuncios, acceso, clasificación IARC (resultó **12+**), público 13–17 (sin Families), seguridad de datos (sin recopilación), ID de publicidad, gubernamental, financiera, salud
+- ✅ Ficha de la tienda en inglés y español (textos, icono, gráfico y capturas), categoría Herramientas y contacto
+- 🙋 Declaración de **servicio en primer plano** (`dataSync`): Play exige un enlace a un video (YouTube, público o no listado) que muestre una descarga con la notificación y la app en segundo plano
+- 🙋 Enviar a revisión desde "Descripción general de la publicación" y pasar a prueba cerrada (≈12 verificadores, 14 días, si la cuenta es personal nueva)
 - 🟡 Reanudar descargas cortadas (hasta 4 intentos con `Range`; 11 pruebas con servidor local)
 - ⬜ Verificación de la app con Play Integrity (frena abusos del proxy)
